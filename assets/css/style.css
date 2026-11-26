@@ -52,3 +52,40 @@ main.wrap { padding-top: 20px; padding-bottom: 40px; }
 .disclosure { margin: 0 0 12px; }
 .footer-nav a { margin-right: 12px; color: var(--muted); }
 .copyright { margin: 12px 0 0; }
+.tool-banner a { display: block; padding: 10px 12px; background: var(--card); border: 1px solid var(--accent); border-radius: 8px; font-weight: 700; text-decoration: none; }
+
+/* 計算ツール */
+.tool-lead { font-size: .95rem; }
+.tool-form { display: grid; gap: 14px; margin: 20px 0; padding: 16px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
+.tool-form label { display: grid; gap: 4px; font-weight: 700; font-size: .95rem; }
+.tool-form label.check { display: flex; gap: 8px; align-items: flex-start; font-weight: 400; }
+.tool-form label.check input { margin-top: .45em; }
+.tool-form fieldset { border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px 12px; display: grid; gap: 8px; }
+.tool-form legend { font-weight: 700; font-size: .95rem; padding: 0 4px; }
+.tool-form fieldset label { font-weight: 400; grid-template-columns: 1fr auto; align-items: center; }
+.tool-form .field { display: inline-flex; align-items: center; gap: 6px; font-weight: 400; }
+.tool-form input[type=number] { width: 9em; max-width: 100%; padding: 8px 10px; font-size: 1rem; border: 1px solid var(--line); border-radius: 6px; background: #fff; color: var(--fg); }
+.tool-form fieldset input[type=number] { width: 4.5em; }
+.tool-form small { font-weight: 400; color: var(--muted); font-size: .8rem; line-height: 1.6; }
+.tool-result { margin: 20px 0; padding: 20px 16px; background: var(--card); border: 2px solid var(--accent); border-radius: 10px; text-align: center; }
+.result-label { margin: 0; color: var(--muted); font-size: .9rem; }
+.result-value { margin: 0; font-size: 2.2rem; font-weight: 700; color: var(--accent); line-height: 1.4; }
+.result-value .unit { font-size: 1rem; margin-left: 4px; }
+.result-note { font-size: .85rem; color: var(--muted); margin: 4px 0 16px; }
+.tool-result .btn { display: block; max-width: 360px; margin: 0 auto; }
+.breakdown { text-align: left; margin-top: 16px; font-size: .85rem; }
+.breakdown summary { cursor: pointer; color: var(--accent); }
+.breakdown table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+.breakdown td { padding: 4px 0; border-bottom: 1px solid var(--line); }
+.breakdown td:last-child { text-align: right; white-space: nowrap; padding-left: 8px; }
+.formula { padding: 10px 12px; background: var(--card); border: 1px solid var(--line); border-radius: 6px; font-size: .9rem; }
+.updated { color: var(--muted); font-size: .8rem; }
+.result-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: .88rem; text-align: left; }
+.result-table td { padding: 6px 0; border-bottom: 1px solid var(--line); }
+.result-table td:last-child { text-align: right; white-space: nowrap; padding-left: 8px; }
+.result-table tr:last-child td { font-weight: 700; border-bottom: 0; }
+.tool-list { list-style: none; padding: 0; display: grid; gap: 12px; }
+.tool-list a { display: block; padding: 14px 16px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; color: var(--fg); text-decoration: none; }
+.tool-list a:hover { border-color: var(--accent); }
+.tool-list strong { display: block; color: var(--accent); }
+.tool-list span { font-size: .85rem; color: var(--muted); }
