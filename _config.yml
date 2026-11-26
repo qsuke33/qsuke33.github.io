@@ -17,6 +17,10 @@ affiliate:
   amazon_tag: ""        # 例: "qsuke33-22"（AmazonアソシエイトのトラッキングID）
   rakuten_id: "59fc4ff5.1aef2b9a.59fc4ff6.d4443cc8"  # 例: "1a2b3c4d.5e6f7a8b.1a2b3c4d.5e6f7a8b"（楽天アフィリエイトID）
 
+# Google Search Console の所有権確認（jekyll-seo-tag が <meta> を出力）
+webmaster_verifications:
+  google: "bAJYdXUFVpJAni5vPUiA54s0o5_2j1aMw9nI9ruLHZc"
+
 # お問い合わせフォーム（Googleフォーム等）のURL。空欄なら「準備中」と表示。
 contact_form_url: ""
 
