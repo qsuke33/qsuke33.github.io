@@ -1,0 +1,112 @@
+---
+layout: default
+title: 年収の壁 早見表・判定ツール【2026年（令和8年）最新】178万・136万・130万円
+description: 2026年（令和8年）の「年収の壁」を一覧と判定ツールで確認できます。所得税178万円、配偶者控除136万円、配偶者特別控除169万円、特定親族特別控除159万・197万円、社会保険130万円（19〜22歳は150万円）、106万円の壁の撤廃に対応。
+permalink: /tools/nenshu-kabe/
+---
+<article class="page tool">
+  <h1 class="post-title">年収の壁 早見表・判定ツール（2026年版）</h1>
+  <p class="tool-lead">パート・アルバイトで働く人の<strong>年収（給与収入）を入れると、2026年（令和8年）のどの「壁」を超えるか</strong>がわかります。令和8年度税制改正で、所得税の壁は178万円、配偶者控除の壁は136万円に上がりました。</p>
+
+  <form id="calc" class="tool-form" onsubmit="return false">
+    <label>働く人の年収（給与・1〜12月の見込み）
+      <span class="field"><input id="income" type="number" inputmode="numeric" min="0" step="1" value="130"> 万円</span>
+    </label>
+    <label>働く人は誰？
+      <select id="who">
+        <option value="spouse">配偶者（妻・夫）</option>
+        <option value="student">子ども（19〜22歳・大学生など）</option>
+        <option value="child">子ども（16〜18歳）・その他の家族</option>
+      </select>
+    </label>
+    <label class="check"><input id="ten20" type="checkbox"> 週20時間以上働いている（勤務先の社会保険に加入する可能性あり）</label>
+  </form>
+
+  <section class="tool-result" aria-live="polite">
+    <p class="result-label">判定結果</p>
+    <ul id="verdicts" class="verdicts"></ul>
+    <p class="result-note">税金の壁は「1〜12月の給与の合計」、社会保険の扶養（130万円）は「これから1年間の見込み収入」で判定します。</p>
+  </section>
+
+  <p class="tool-banner"><a href="{{ '/tools/tedori/' | relative_url }}">年収から手取りを計算する（手取り計算シミュレーター）</a></p>
+
+  <div class="post-body">
+    <h2>2026年（令和8年）の年収の壁 一覧</h2>
+    <div class="table-scroll">
+    <table class="kabe-table">
+      <thead><tr><th>年収</th><th>何が起きる？</th><th>対象</th></tr></thead>
+      <tbody>
+        <tr><td>自治体により<br>約100〜120万円</td><td>働く本人に<strong>住民税</strong>がかかり始める（金額は自治体と扶養の状況で異なる）</td><td>本人</td></tr>
+        <tr><td>週20時間以上</td><td>勤務先の<strong>社会保険（厚生年金・健康保険）に加入</strong>。月8.8万円（年106万円）の賃金要件は2026年10月に撤廃予定と発表されていました（実際の扱いは勤務先で確認を）。企業規模の要件も段階的に縮小</td><td>本人</td></tr>
+        <tr><td><strong>130万円</strong></td><td>家族の<strong>社会保険の扶養から外れる</strong>（自分で国民年金・国民健康保険などに加入）。19〜22歳は150万円</td><td>本人</td></tr>
+        <tr><td><strong>136万円</strong></td><td>家族が<strong>配偶者控除・扶養控除</strong>を受けられなくなる（配偶者は配偶者特別控除に切り替わる）。2025年は123万円</td><td>家族</td></tr>
+        <tr><td>159万円</td><td>19〜22歳の子の<strong>特定親族特別控除</strong>が満額（63万円）でなくなり、段階的に減る</td><td>家族</td></tr>
+        <tr><td>169万円</td><td>配偶者特別控除が満額（38万円）でなくなり、段階的に減る</td><td>家族</td></tr>
+        <tr><td><strong>178万円</strong></td><td>働く本人に<strong>所得税</strong>がかかり始める。2025年は160万円</td><td>本人</td></tr>
+        <tr><td>197万円</td><td>特定親族特別控除がなくなる</td><td>家族</td></tr>
+        <tr><td>約207万円</td><td>配偶者特別控除がなくなる</td><td>家族</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h2>どの壁を気にすればいい？</h2>
+    <ul>
+      <li><strong>一番影響が大きいのは社会保険（130万円・週20時間）</strong>です。超えると年20万円前後の保険料がかかり、手取りが一時的に減ります。ただし勤務先の厚生年金に入ると、将来の年金が増え、病気やけがのときの傷病手当金も受けられます。</li>
+      <li><strong>税金の壁（136万・178万円）は、超えても手取りが逆転しにくい</strong>仕組みです。配偶者特別控除で家族の控除は段階的に減り、本人の所得税も超えた分にかかるだけです。</li>
+      <li>家族手当（配偶者手当）の支給条件を「103万円」「130万円」などにしている会社もあります。勤務先の規定を確認しましょう。</li>
+    </ul>
+
+    <h2>注意点</h2>
+    <ul>
+      <li>この表は、給与収入だけの人を前提にした目安です。給与以外の所得（事業・年金など）がある場合は計算が異なります。</li>
+      <li>配偶者控除・配偶者特別控除は、控除を受ける側（家族）の合計所得が1,000万円（年収約1,195万円）を超えると受けられません。</li>
+      <li>税制は毎年のように改正されます。最終的には勤務先や税務署・お住まいの自治体で確認してください。</li>
+    </ul>
+    <p class="updated">最終更新：2026年11月26日</p>
+  </div>
+</article>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  function item(state, text) {
+    return '<li class="v-' + state + '"><span class="v-mark">' + (state === 'over' ? '超えている' : state === 'ok' ? 'OK' : '注意') + '</span>' + text + '</li>';
+  }
+  function calc() {
+    var v = parseFloat($('income').value); if (!isFinite(v) || v < 0) v = 0;
+    var who = $('who').value, ten20 = $('ten20').checked;
+    var out = [];
+
+    if (ten20) out.push(item('warn', '週20時間以上なので、勤務先の社会保険に加入する可能性があります（会社の規模などの条件あり）。'));
+    var shaho = who === 'student' ? 150 : 130;
+    out.push(v >= shaho
+      ? item('over', '社会保険の扶養（' + shaho + '万円）を超えています。自分で社会保険に加入する必要があります。')
+      : item('ok', '社会保険の扶養（' + shaho + '万円）の範囲内です' + (shaho - v <= 10 ? '（あと' + Math.round((shaho - v) * 10) / 10 + '万円）' : '') + '。'));
+
+    if (who === 'spouse') {
+      if (v <= 136) out.push(item('ok', '家族は配偶者控除（38万円）を受けられます。'));
+      else if (v <= 169) out.push(item('ok', '配偶者控除の136万円は超えますが、家族は配偶者特別控除（満額38万円）を受けられるので、税金の影響はほぼありません。'));
+      else if (v < 207) out.push(item('warn', '家族の配偶者特別控除が減り始めています（169万円超で段階的に減少）。'));
+      else out.push(item('over', '家族の配偶者特別控除はなくなります。'));
+    } else if (who === 'student') {
+      if (v <= 136) out.push(item('ok', '家族は特定扶養控除（63万円）を受けられます。'));
+      else if (v <= 159) out.push(item('ok', '扶養控除の136万円は超えますが、家族は特定親族特別控除（満額63万円）を受けられます。'));
+      else if (v <= 197) out.push(item('warn', '家族の特定親族特別控除が減り始めています（159万円超で段階的に減少）。'));
+      else out.push(item('over', '家族の特定親族特別控除はなくなります。'));
+    } else {
+      out.push(v <= 136 ? item('ok', '家族は扶養控除を受けられます（16歳以上の場合）。')
+        : item('over', '家族は扶養控除を受けられなくなります（136万円超）。'));
+    }
+
+    out.push(v > 178 ? item('over', '本人に所得税がかかります（178万円超）。')
+      : item('ok', '本人に所得税はかかりません（178万円以下）。'));
+    out.push(v > 100 ? item('warn', '本人に住民税がかかる可能性があります（約100〜120万円から。自治体により異なる）。')
+      : item('ok', '住民税はかからないことが多い年収です（自治体により異なる）。'));
+
+    $('verdicts').innerHTML = out.join('');
+  }
+  $('calc').addEventListener('input', calc);
+  $('calc').addEventListener('change', calc);
+  calc();
+})();
+</script>
