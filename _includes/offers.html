@@ -1,0 +1,18 @@
+{%- comment -%}
+  使い方: {% include offers.html key="ideco" title="iDeCoを始めるなら" %}
+  _data/offers.yml の該当キーに広告がある場合だけ表示する。
+{%- endcomment -%}
+{%- assign offers = site.data.offers[include.key] -%}
+{%- if offers and offers.size > 0 -%}
+<section class="offers">
+  <p class="pr-label"><span>広告・PR</span>このページには広告（アフィリエイトリンク）が含まれています。</p>
+  {%- if include.title -%}<h2>{{ include.title }}</h2>{%- endif -%}
+  {%- for o in offers -%}
+  <div class="offer">
+    <a class="btn" href="{{ o.url }}" target="_blank" rel="sponsored noopener">{{ o.name }}</a>
+    {%- if o.pixel -%}<img src="{{ o.pixel }}" width="1" height="1" alt="" style="border:0">{%- endif -%}
+    {%- if o.note -%}<p class="offer-note">{{ o.note }}</p>{%- endif -%}
+  </div>
+  {%- endfor -%}
+</section>
+{%- endif -%}
