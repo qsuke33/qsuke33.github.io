@@ -1,0 +1,100 @@
+---
+layout: default
+title: 手取り計算シミュレーター【2026年（令和8年）改正・最新保険料率対応】
+description: 年収（額面）から手取り額を計算します。2026年の基礎控除・給与所得控除の引き上げ、令和8年度の社会保険料率（子ども・子育て支援金を含む）に対応。月の手取り・税金・社会保険料の内訳がわかります。
+permalink: /tools/tedori/
+---
+<article class="page tool">
+  <h1 class="post-title">手取り計算シミュレーター</h1>
+  <p class="tool-lead">会社員の<strong>年収（額面）から手取り額</strong>を計算します。2026年（令和8年）の税制改正と、令和8年度の社会保険料率（4月から始まった子ども・子育て支援金を含む）を反映しています。入力内容はこの端末の中だけで計算し、どこにも送信しません。</p>
+
+  <form id="calc" class="tool-form" onsubmit="return false">
+    <label>給与の年収（額面・賞与込み）
+      <span class="field"><input id="income" type="number" inputmode="numeric" min="0" step="1" value="500"> 万円</span>
+    </label>
+    <label>うち賞与（ボーナス）の年間合計
+      <span class="field"><input id="bonus" type="number" inputmode="numeric" min="0" step="1" value="0"> 万円</span>
+      <small>年2回同じ額が出るものとして計算します。</small>
+    </label>
+    <label class="check"><input id="age40" type="checkbox"> 40〜64歳（介護保険料がかかる）</label>
+    <label class="check"><input id="spouse" type="checkbox"> 配偶者控除を受けている（配偶者の年収が約123万円以下）</label>
+    <fieldset>
+      <legend>扶養している家族の人数（配偶者以外）</legend>
+      <label>16〜18歳・23〜69歳 <span class="field"><input id="dep_general" type="number" min="0" step="1" value="0"> 人</span></label>
+      <label>19〜22歳（大学生など） <span class="field"><input id="dep_special" type="number" min="0" step="1" value="0"> 人</span></label>
+      <label>70歳以上 <span class="field"><input id="dep_old" type="number" min="0" step="1" value="0"> 人</span></label>
+      <small>15歳以下の子どもは扶養控除がないため、手取りに影響しません。</small>
+    </fieldset>
+  </form>
+
+  <section class="tool-result" aria-live="polite">
+    <p class="result-label">年間の手取り額</p>
+    <p class="result-value"><span id="net">—</span><span class="unit">円</span></p>
+    <p id="result-note" class="result-note"></p>
+    <table class="result-table"><tbody id="breakdown"></tbody></table>
+  </section>
+
+  <p class="tool-banner"><a href="{{ '/tools/furusato/' | relative_url }}">ふるさと納税はいくらまでできる？ 控除上限額シミュレーターで計算する</a></p>
+
+  <div class="post-body">
+    <h2>計算の前提</h2>
+    <ul>
+      <li>健康保険は<strong>協会けんぽの全国平均（9.90%）</strong>で計算しています。都道府県や健康保険組合によって数千円〜数万円変わります。</li>
+      <li>厚生年金18.3%、介護保険1.62%（40〜64歳）、子ども・子育て支援金0.23%は会社と折半、雇用保険は本人負担0.50%（一般の事業）です。</li>
+      <li>社会保険料は月給をならして計算しています（実際は4〜6月の給与で決まる「標準報酬月額」で計算されます）。</li>
+      <li>住民税は、前年と同じ年収が続いた場合の年額です（住民税は前年の所得で決まるため、昇給した年は実際の負担が少し小さくなります）。</li>
+      <li>生命保険料控除・iDeCo・住宅ローン控除などは含めていません。それらがある人は、実際の手取りはもう少し多くなります。</li>
+    </ul>
+
+    <h2>2026年（令和8年）は何が変わった？</h2>
+    <ul>
+      <li><strong>所得税の基礎控除の引き上げ</strong>：合計所得489万円以下なら104万円に。年収およそ665万円以下の人を中心に所得税が下がります。</li>
+      <li><strong>給与所得控除の最低保障の引き上げ</strong>：65万円から74万円（令和8・9年分）に。所得税がかからない年収は178万円になりました。</li>
+      <li><strong>子ども・子育て支援金の開始</strong>：2026年4月分から健康保険料に上乗せ。本人負担は給与の約0.115%です。</li>
+      <li><strong>健康保険・雇用保険の料率の引き下げ</strong>：協会けんぽ平均は10.0%→9.90%、雇用保険の本人負担は0.55%→0.50%になりました。</li>
+    </ul>
+    <p class="updated">最終更新：2026年11月26日</p>
+  </div>
+</article>
+
+<script src="{{ '/assets/js/tax2026.js' | relative_url }}"></script>
+<script>
+(function () {
+  var MAN = 10000;
+  var $ = function (id) { return document.getElementById(id); };
+  var num = function (id) { var v = parseFloat($(id).value); return isFinite(v) && v > 0 ? v : 0; };
+  var cnt = function (id) { return Math.floor(num(id)); };
+  var yen = function (v) { return Math.round(v).toLocaleString('ja-JP') + '円'; };
+
+  function calc() {
+    var salary = num('income') * MAN;
+    var bonus = Math.min(num('bonus') * MAN, salary);
+    var si = Tax2026.socialInsurance({ monthly: (salary - bonus) / 12, bonus: bonus, age40to64: $('age40').checked });
+    var t = Tax2026.taxes({
+      salary: salary, shaho: si.total, spouse: $('spouse').checked,
+      dg: cnt('dep_general'), ds: cnt('dep_special'), dot: cnt('dep_old')
+    });
+    var net = salary - si.total - t.incomeTax - t.juminTax;
+
+    if (salary <= 0) { $('net').textContent = '—'; $('result-note').textContent = ''; $('breakdown').innerHTML = ''; return; }
+    $('net').textContent = Math.round(net).toLocaleString('ja-JP');
+    $('result-note').textContent = '手取り率 ' + (net / salary * 100).toFixed(1) + '%' +
+      (bonus > 0 ? '／ 賞与のない月の手取り 約' + yen(Math.round((salary - bonus) / 12 * net / salary / 1000) * 1000) :
+        '／ 月の手取り 約' + yen(net / 12));
+    var rows = [
+      ['額面年収', yen(salary)],
+      ['健康保険料（介護・子ども子育て支援金を含む）', '−' + yen(si.kenpo)],
+      ['厚生年金保険料', '−' + yen(si.kosei)],
+      ['雇用保険料', '−' + yen(si.koyo)],
+      ['所得税（復興特別所得税を含む）', '−' + yen(t.incomeTax)],
+      ['住民税', '−' + yen(t.juminTax)],
+      ['手取り', yen(net)]
+    ];
+    $('breakdown').innerHTML = rows.map(function (r) { return '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td></tr>'; }).join('');
+  }
+
+  $('calc').addEventListener('input', calc);
+  $('calc').addEventListener('change', calc);
+  calc();
+})();
+</script>

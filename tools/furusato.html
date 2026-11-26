@@ -77,34 +77,7 @@ permalink: /tools/furusato/
   </div>
 </article>
 
-<style>
-.tool-lead { font-size: .95rem; }
-.tool-form { display: grid; gap: 14px; margin: 20px 0; padding: 16px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
-.tool-form label { display: grid; gap: 4px; font-weight: 700; font-size: .95rem; }
-.tool-form label.check { display: flex; gap: 8px; align-items: flex-start; font-weight: 400; }
-.tool-form label.check input { margin-top: .45em; }
-.tool-form fieldset { border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px 12px; display: grid; gap: 8px; }
-.tool-form legend { font-weight: 700; font-size: .95rem; padding: 0 4px; }
-.tool-form fieldset label { font-weight: 400; grid-template-columns: 1fr auto; align-items: center; }
-.tool-form .field { display: inline-flex; align-items: center; gap: 6px; font-weight: 400; }
-.tool-form input[type=number] { width: 9em; max-width: 100%; padding: 8px 10px; font-size: 1rem; border: 1px solid var(--line); border-radius: 6px; background: #fff; color: var(--fg); }
-.tool-form fieldset input[type=number] { width: 4.5em; }
-.tool-form small { font-weight: 400; color: var(--muted); font-size: .8rem; line-height: 1.6; }
-.tool-result { margin: 20px 0; padding: 20px 16px; background: var(--card); border: 2px solid var(--accent); border-radius: 10px; text-align: center; }
-.result-label { margin: 0; color: var(--muted); font-size: .9rem; }
-.result-value { margin: 0; font-size: 2.2rem; font-weight: 700; color: var(--accent); line-height: 1.4; }
-.result-value .unit { font-size: 1rem; margin-left: 4px; }
-.result-note { font-size: .85rem; color: var(--muted); margin: 4px 0 16px; }
-.tool-result .btn { display: block; max-width: 360px; margin: 0 auto; }
-.breakdown { text-align: left; margin-top: 16px; font-size: .85rem; }
-.breakdown summary { cursor: pointer; color: var(--accent); }
-.breakdown table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-.breakdown td { padding: 4px 0; border-bottom: 1px solid var(--line); }
-.breakdown td:last-child { text-align: right; white-space: nowrap; padding-left: 8px; }
-.formula { padding: 10px 12px; background: var(--card); border: 1px solid var(--line); border-radius: 6px; font-size: .9rem; }
-.updated { color: var(--muted); font-size: .8rem; }
-</style>
-
+<script src="{{ '/assets/js/tax2026.js' | relative_url }}"></script>
 <script>
 (function () {
   var MAN = 10000;
@@ -113,81 +86,14 @@ permalink: /tools/furusato/
   var cnt = function (id) { return Math.floor(num(id)); };
   var yen = function (v) { return Math.round(v).toLocaleString('ja-JP') + '円'; };
 
-  // 給与所得控除（2026年分）。所得税は最低保障74万円（令和8・9年分の特例込み）、住民税は69万円で概算。
-  function kyuyoKojo(s, minimum) {
-    var k;
-    if (s <= 1900000) k = 650000;
-    else if (s <= 3600000) k = s * 0.3 + 80000;
-    else if (s <= 6600000) k = s * 0.2 + 440000;
-    else if (s <= 8500000) k = s * 0.1 + 1100000;
-    else k = 1950000;
-    return Math.min(s, Math.max(k, minimum));
-  }
-
-  // 所得税の基礎控除（2026年分）
-  function kisoShotoku(g) {
-    if (g <= 4890000) return 1040000;
-    if (g <= 6550000) return 670000;
-    if (g <= 23500000) return 620000;
-    if (g <= 24000000) return 480000;
-    if (g <= 24500000) return 320000;
-    if (g <= 25000000) return 160000;
-    return 0;
-  }
-  // 住民税の基礎控除
-  function kisoJumin(g) {
-    if (g <= 24000000) return 430000;
-    if (g <= 24500000) return 290000;
-    if (g <= 25000000) return 150000;
-    return 0;
-  }
-  // 配偶者控除 [所得税, 住民税]（本人の合計所得で逓減）
-  function haigusha(g) {
-    if (g <= 9000000) return [380000, 330000];
-    if (g <= 9500000) return [260000, 220000];
-    if (g <= 10000000) return [130000, 110000];
-    return [0, 0];
-  }
-  function shotokuRate(t) {
-    if (t <= 1950000) return 0.05;
-    if (t <= 3300000) return 0.10;
-    if (t <= 6950000) return 0.20;
-    if (t <= 9000000) return 0.23;
-    if (t <= 18000000) return 0.33;
-    if (t <= 40000000) return 0.40;
-    return 0.45;
-  }
-
   function calc() {
     var salary = num('income') * MAN;
     var shaho = $('shaho').value === '' ? salary * 0.15 : num('shaho') * MAN;
-    var other = num('other') * MAN;
-    var dg = cnt('dep_general'), ds = cnt('dep_special'), dol = cnt('dep_old_live'), dot = cnt('dep_old');
-
-    var gIncomeTax = Math.max(0, salary - kyuyoKojo(salary, 740000));
-    var gJumin = Math.max(0, salary - kyuyoKojo(salary, 690000));
-
-    var sp = $('spouse').checked ? haigusha(gJumin) : [0, 0];
-    var depTax = dg * 380000 + ds * 630000 + dol * 580000 + dot * 480000;
-    var depJumin = dg * 330000 + ds * 450000 + dol * 450000 + dot * 380000;
-
-    var kisoT = kisoShotoku(gIncomeTax), kisoJ = kisoJumin(gJumin);
-    var taxableT = Math.floor(Math.max(0, gIncomeTax - shaho - other - kisoT - sp[0] - depTax) / 1000) * 1000;
-    var taxableJ = Math.floor(Math.max(0, gJumin - shaho - other - kisoJ - sp[1] - depJumin) / 1000) * 1000;
-
-    // 調整控除（人的控除の差額）
-    var spDiff = sp[1] === 330000 ? 50000 : sp[1] === 220000 ? 40000 : sp[1] === 110000 ? 20000 : 0;
-    var diff = (gJumin <= 25000000 ? 50000 : 0) + spDiff + dg * 50000 + ds * 180000 + dol * 130000 + dot * 100000;
-    var adj = 0;
-    if (gJumin <= 25000000 && taxableJ > 0) {
-      if (taxableJ <= 2000000) adj = Math.min(diff, taxableJ) * 0.05;
-      else adj = Math.max((diff - (taxableJ - 2000000)) * 0.05, 2500);
-    }
-    var shotokuwari = Math.max(0, taxableJ * 0.1 - adj);
-    var rate = taxableT > 0 ? shotokuRate(taxableT) : 0;
-
-    var limit = shotokuwari > 0 ? shotokuwari * 0.2 / (0.9 - rate * 1.021) + 2000 : 0;
-    var shown = Math.floor(limit / 1000) * 1000;
+    var t = Tax2026.taxes({
+      salary: salary, shaho: shaho, other: num('other') * MAN, spouse: $('spouse').checked,
+      dg: cnt('dep_general'), ds: cnt('dep_special'), dol: cnt('dep_old_live'), dot: cnt('dep_old')
+    });
+    var shown = Math.floor(Tax2026.furusatoLimit(t) / 1000) * 1000;
 
     $('limit').textContent = salary > 0 ? shown.toLocaleString('ja-JP') : '—';
     var note = '';
@@ -197,12 +103,12 @@ permalink: /tools/furusato/
     $('result-note').textContent = note;
 
     var rows = [
-      ['給与所得（住民税）', yen(gJumin)],
+      ['給与所得（住民税）', yen(t.gJumin)],
       ['社会保険料', yen(shaho)],
-      ['住民税の課税所得', yen(taxableJ)],
-      ['住民税 所得割額', yen(shotokuwari)],
-      ['所得税の課税所得', yen(taxableT)],
-      ['所得税率', rate ? Math.round(rate * 100) + '%' : '0%（所得税なし）']
+      ['住民税の課税所得', yen(t.taxableJ)],
+      ['住民税 所得割額', yen(t.shotokuwari)],
+      ['所得税の課税所得', yen(t.taxableT)],
+      ['所得税率', t.rate ? Math.round(t.rate * 100) + '%' : '0%（所得税なし）']
     ];
     $('breakdown').innerHTML = rows.map(function (r) { return '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td></tr>'; }).join('');
   }
