@@ -12,6 +12,7 @@ permalink: /tools/furusato/
   {%- assign rakuten_link = rakuten_furusato -%}
 {%- endif -%}
 <article class="page tool">
+  <nav class="crumbs"><a href="{{ '/' | relative_url }}">ホーム</a> › <a href="{{ '/tools/' | relative_url }}">計算ツール</a></nav>
   {% include pr-label.html %}
   <h1 class="post-title">ふるさと納税 控除上限額シミュレーター</h1>
   <p class="tool-lead">2026年（令和8年）1〜12月に寄付する分の、<strong>自己負担2,000円で済む寄付額の上限の目安</strong>を計算します。令和8年度税制改正（基礎控除・給与所得控除の引き上げ）を反映しています。入力内容はこの端末の中だけで計算し、どこにも送信しません。</p>
@@ -75,6 +76,7 @@ permalink: /tools/furusato/
     <p>給与所得控除・基礎控除・配偶者控除・扶養控除・調整控除は2026年分の税制に合わせて計算し、住民税は標準税率（10%）を前提にしています。</p>
     <p class="updated">最終更新：2026年11月26日</p>
   </div>
+  {% include related-tools.html %}
 </article>
 
 <script src="{{ '/assets/js/tax2026.js' | relative_url }}"></script>

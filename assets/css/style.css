@@ -103,3 +103,7 @@ main.wrap { padding-top: 20px; padding-bottom: 40px; }
 .kabe-table th { background: var(--card); }
 .kabe-table td:first-child { white-space: nowrap; }
 .kabe-table td:last-child { white-space: nowrap; color: var(--muted); }
+.crumbs { font-size: .8rem; color: var(--muted); margin-bottom: 8px; }
+.crumbs a { color: var(--muted); }
+.related-tools { margin-top: 32px; }
+.related-tools h2 { font-size: 1.1rem; }
