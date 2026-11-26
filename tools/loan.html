@@ -1,0 +1,108 @@
+---
+layout: default
+title: 住宅ローン返済シミュレーター【元利均等・元金均等・金利上昇の比較】
+description: 借入額・金利・返済期間から、住宅ローンの毎月の返済額と総返済額・利息を計算します。元利均等と元金均等の比較、金利が上がった場合の返済額もわかります。
+permalink: /tools/loan/
+---
+<article class="page tool">
+  <nav class="crumbs"><a href="{{ '/' | relative_url }}">ホーム</a> › <a href="{{ '/tools/' | relative_url }}">計算ツール</a></nav>
+  <h1 class="post-title">住宅ローン返済シミュレーター</h1>
+  <p class="tool-lead">借入額・金利・返済期間を入れると、<strong>毎月の返済額・総返済額・利息の合計</strong>を計算します。金利が上がったときの返済額も同時に表示します。入力内容はこの端末の中だけで計算し、どこにも送信しません。</p>
+
+  <form id="calc" class="tool-form" onsubmit="return false">
+    <label>借入額
+      <span class="field"><input id="amount" type="number" inputmode="numeric" min="0" step="10" value="3500"> 万円</span>
+    </label>
+    <label>金利（年）
+      <span class="field"><input id="rate" type="number" inputmode="decimal" min="0" max="20" step="0.01" value="0.9"> %</span>
+    </label>
+    <label>返済期間
+      <span class="field"><input id="years" type="number" inputmode="numeric" min="1" max="50" step="1" value="35"> 年</span>
+    </label>
+    <label>返済方法
+      <select id="method">
+        <option value="annuity">元利均等返済（毎月の返済額が一定）</option>
+        <option value="principal">元金均等返済（返済額がだんだん減る）</option>
+      </select>
+    </label>
+  </form>
+
+  <section class="tool-result" aria-live="polite">
+    <p class="result-label" id="monthly-label">毎月の返済額</p>
+    <p class="result-value"><span id="monthly">—</span><span class="unit">円</span></p>
+    <p id="result-note" class="result-note"></p>
+    <table class="result-table"><tbody id="breakdown"></tbody></table>
+  </section>
+
+  <section class="post-body">
+    <h2>金利が上がったら？（元利均等・同じ条件で比較）</h2>
+    <div class="table-scroll">
+      <table class="kabe-table"><thead><tr><th>金利</th><th>毎月の返済額</th><th>総返済額</th><th>今の条件との差（総額）</th></tr></thead><tbody id="ratetable"></tbody></table>
+    </div>
+    <p>変動金利は、半年ごとに金利が見直されるのが一般的です。ただし多くの銀行では、返済額は5年間変わらず、上がるときも前の1.25倍までという決まり（5年ルール・125%ルール）があります。返済額が変わらなくても、内訳の利息が増えて元金の減りが遅くなります。</p>
+
+    <h2>元利均等と元金均等の違い</h2>
+    <ul>
+      <li><strong>元利均等返済</strong>：毎月の返済額が一定で、家計の計画が立てやすい。はじめのうちは返済額の多くが利息になります。多くの人がこちらを選びます。</li>
+      <li><strong>元金均等返済</strong>：元金を毎月同じ額ずつ返すので、はじめの返済額は多いものの、<strong>利息の総額は少なく</strong>なります。取り扱っていない金融機関もあります。</li>
+    </ul>
+
+    <h2>注意点</h2>
+    <ul>
+      <li>金利がずっと同じと仮定した計算です。保証料・事務手数料・団信の上乗せ金利・火災保険料などは含みません。</li>
+      <li>ボーナス払いは含みません。</li>
+      <li>住宅ローン控除（減税）を受けると、実際の負担は小さくなります。</li>
+    </ul>
+    <p class="updated">最終更新：2026年11月26日</p>
+  </section>
+  {% include related-tools.html %}
+</article>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var num = function (id) { var v = parseFloat($(id).value); return isFinite(v) && v > 0 ? v : 0; };
+  var yen = function (v) { return Math.round(v).toLocaleString('ja-JP') + '円'; };
+
+  function annuity(P, r, n) {
+    var m = r / 12;
+    var pay = m === 0 ? P / n : P * m / (1 - Math.pow(1 + m, -n));
+    return { first: pay, total: pay * n };
+  }
+  function principal(P, r, n) {
+    var m = r / 12, base = P / n, total = 0;
+    for (var i = 0; i < n; i++) total += base + (P - base * i) * m;
+    return { first: base + P * m, last: base + base * m, total: total };
+  }
+
+  function calc() {
+    var P = num('amount') * 10000, r = num('rate') / 100, n = Math.round(num('years')) * 12;
+    var method = $('method').value;
+    if (!P || !n) { $('monthly').textContent = '—'; $('breakdown').innerHTML = ''; $('ratetable').innerHTML = ''; $('result-note').textContent = ''; return; }
+    var res = method === 'annuity' ? annuity(P, r, n) : principal(P, r, n);
+    $('monthly-label').textContent = method === 'annuity' ? '毎月の返済額' : '初回の返済額';
+    $('monthly').textContent = Math.round(res.first).toLocaleString('ja-JP');
+    var other = method === 'annuity' ? principal(P, r, n) : annuity(P, r, n);
+    $('result-note').textContent = method === 'annuity'
+      ? '元金均等にすると利息が約' + yen(res.total - other.total) + '少なくなります'
+      : '最終回は約' + yen(res.last) + '。元利均等より利息が約' + yen(other.total - res.total) + '少なくなります';
+    var rows = [
+      ['借入額', yen(P)],
+      ['利息の合計', yen(res.total - P)],
+      ['総返済額', yen(res.total)]
+    ];
+    $('breakdown').innerHTML = rows.map(function (x) { return '<tr><td>' + x[0] + '</td><td>' + x[1] + '</td></tr>'; }).join('');
+
+    var base = annuity(P, r, n);
+    var steps = [0, 0.5, 1, 1.5, 2];
+    $('ratetable').innerHTML = steps.map(function (d) {
+      var rr = r + d / 100, a = annuity(P, rr, n);
+      return '<tr><td>' + (rr * 100).toFixed(2) + '%' + (d ? '（+' + d + '%）' : '（今の条件）') + '</td><td>' + yen(a.first) + '</td><td>' + yen(a.total) + '</td><td>' + (d ? '+' + yen(a.total - base.total) : '—') + '</td></tr>';
+    }).join('');
+  }
+
+  $('calc').addEventListener('input', calc);
+  $('calc').addEventListener('change', calc);
+  calc();
+})();
+</script>
