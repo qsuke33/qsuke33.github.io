@@ -1,0 +1,110 @@
+---
+layout: default
+title: iDeCo 節税シミュレーター【2026年12月の掛金上限引き上げ（月6.2万円）対応】
+description: iDeCo（個人型確定拠出年金）でいくら節税できるかを、年収と掛金から計算します。2026年12月分からの拠出限度額の引き上げ（会社員 月6.2万円）と、2026年（令和8年）の税制改正に対応。
+permalink: /tools/ideco/
+---
+<article class="page tool">
+  <h1 class="post-title">iDeCo 節税シミュレーター</h1>
+  <p class="tool-lead">会社員・公務員が<strong>iDeCoに掛金を出すと、所得税と住民税がいくら安くなるか</strong>を計算します。<strong>2026年12月分（2027年1月引き落とし）から掛金の上限が引き上げられ</strong>、会社員は月6.2万円まで出せるようになります。入力内容はこの端末の中だけで計算し、どこにも送信しません。</p>
+
+  <form id="calc" class="tool-form" onsubmit="return false">
+    <label>給与の年収（額面）
+      <span class="field"><input id="income" type="number" inputmode="numeric" min="0" step="1" value="500"> 万円</span>
+    </label>
+    <label>毎月の掛金
+      <span class="field"><input id="monthly" type="number" inputmode="numeric" min="0" step="1000" value="23000"> 円</span>
+      <small>5,000円以上、1,000円単位。上限は下の表を参照。</small>
+    </label>
+    <label>積み立てる年数
+      <span class="field"><input id="years" type="number" inputmode="numeric" min="1" max="50" step="1" value="20"> 年</span>
+    </label>
+    <label class="check"><input id="age40" type="checkbox"> 40〜64歳</label>
+    <label class="check"><input id="spouse" type="checkbox"> 配偶者控除を受けている</label>
+  </form>
+
+  <section class="tool-result" aria-live="polite">
+    <p class="result-label">1年あたりの節税額</p>
+    <p class="result-value"><span id="saving">—</span><span class="unit">円</span></p>
+    <p id="result-note" class="result-note"></p>
+    <table class="result-table"><tbody id="breakdown"></tbody></table>
+  </section>
+
+  <p class="tool-banner"><a href="{{ '/tools/furusato/' | relative_url }}">iDeCoを始めるとふるさと納税の上限は下がります → 控除上限額を計算する</a></p>
+
+  <div class="post-body">
+    <h2>iDeCoの掛金の上限（月額）</h2>
+    <div class="table-scroll">
+    <table class="kabe-table">
+      <thead><tr><th>働き方</th><th>2026年11月分まで</th><th>2026年12月分から</th></tr></thead>
+      <tbody>
+        <tr><td>会社員（企業年金なし）</td><td>2.3万円</td><td><strong>6.2万円</strong></td></tr>
+        <tr><td>会社員・公務員（企業年金あり）</td><td>2万円</td><td><strong>6.2万円−企業年金の掛金</strong></td></tr>
+        <tr><td>自営業・フリーランス</td><td>6.8万円</td><td><strong>7.5万円</strong>（国民年金基金などと合計）</td></tr>
+        <tr><td>専業主婦（夫）</td><td>2.3万円</td><td>2.3万円</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p>掛金を増やすには、加入している金融機関（運営管理機関）での変更手続きが必要です。手続きの締め切りは金融機関によって異なるので、早めに確認しましょう。</p>
+
+    <h2>節税のしくみ</h2>
+    <ul>
+      <li>iDeCoの掛金は全額が<strong>小規模企業共済等掛金控除</strong>として所得から差し引かれ、その分の所得税（税率5〜45%）と住民税（10%）が安くなります。</li>
+      <li>会社員は年末調整で、自営業の人は確定申告で控除を受けます。</li>
+      <li>運用で得た利益にも税金がかからず、受け取るときも退職所得控除・公的年金等控除の対象になります（このツールでは掛金の節税分だけを計算しています）。</li>
+    </ul>
+
+    <h2>注意点</h2>
+    <ul>
+      <li><strong>原則60歳まで引き出せません。</strong>生活費や近いうちに使うお金は別に確保しておきましょう。</li>
+      <li>口座管理手数料（月171円〜）がかかります。所得税がかからない年収の人は、節税効果が小さくなります。</li>
+      <li>元本割れする商品もあります。運用商品は自分で選びます。</li>
+      <li>年収や税制が将来も変わらないと仮定した目安です。社会保険料は協会けんぽの平均料率で計算しています。</li>
+    </ul>
+    <p class="updated">最終更新：2026年11月26日</p>
+  </div>
+</article>
+
+<script src="{{ '/assets/js/tax2026.js' | relative_url }}"></script>
+<script>
+(function () {
+  var MAN = 10000;
+  var $ = function (id) { return document.getElementById(id); };
+  var num = function (id) { var v = parseFloat($(id).value); return isFinite(v) && v > 0 ? v : 0; };
+  var yen = function (v) { return Math.round(v).toLocaleString('ja-JP') + '円'; };
+
+  function calc() {
+    var salary = num('income') * MAN;
+    var yearly = num('monthly') * 12;
+    var years = Math.min(50, Math.floor(num('years')));
+    if (salary <= 0) { $('saving').textContent = '—'; $('result-note').textContent = ''; $('breakdown').innerHTML = ''; return; }
+
+    var si = Tax2026.socialInsurance({ monthly: salary / 12, bonus: 0, age40to64: $('age40').checked });
+    var base = { salary: salary, shaho: si.total, spouse: $('spouse').checked };
+    var t0 = Tax2026.taxes(base);
+    var t1 = Tax2026.taxes(Object.assign({}, base, { other: yearly }));
+    var dIncome = t0.incomeTax - t1.incomeTax;
+    var dJumin = t0.shotokuwari - t1.shotokuwari;
+    var saving = Math.max(0, dIncome + dJumin);
+
+    $('saving').textContent = Math.round(saving).toLocaleString('ja-JP');
+    $('result-note').textContent = yearly > 0
+      ? '掛金の約' + Math.round(saving / yearly * 100) + '%が戻ってくる計算です' + (num('monthly') > 62000 ? '（会社員の上限は月6.2万円です）' : '')
+      : '';
+    var f0 = Tax2026.furusatoLimit(t0), f1 = Tax2026.furusatoLimit(t1);
+    var rows = [
+      ['年間の掛金', yen(yearly)],
+      ['所得税の軽減額', yen(dIncome)],
+      ['住民税の軽減額', yen(dJumin)],
+      [years + '年間の掛金合計', yen(yearly * years)],
+      [years + '年間の節税額合計', yen(saving * years)],
+      ['ふるさと納税の上限の変化', yen(Math.floor(f0 / 1000) * 1000) + ' → ' + yen(Math.floor(f1 / 1000) * 1000)]
+    ];
+    $('breakdown').innerHTML = rows.map(function (r) { return '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td></tr>'; }).join('');
+  }
+
+  $('calc').addEventListener('input', calc);
+  $('calc').addEventListener('change', calc);
+  calc();
+})();
+</script>
