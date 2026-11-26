@@ -1,0 +1,46 @@
+# =============================================================
+#  サイト全体の設定（変更したら push するだけで反映されます）
+# =============================================================
+title: "qsuke33の買ってよかったもの"
+description: "qsuke33が実際に購入した商品のレビュー"
+author: qsuke33
+url: "https://qsuke33.github.io"
+baseurl: ""
+lang: ja
+timezone: Asia/Tokyo
+
+# -------------------------------------------------------------
+#  ★ アフィリエイトID（ここ1か所を書き換えるだけで全記事に反映）
+#     空欄のままなら、ID なしの通常リンクになります。
+# -------------------------------------------------------------
+affiliate:
+  amazon_tag: ""        # 例: "qsuke33-22"（AmazonアソシエイトのトラッキングID）
+  rakuten_id: ""        # 例: "1a2b3c4d.5e6f7a8b.1a2b3c4d.5e6f7a8b"（楽天アフィリエイトID）
+
+# お問い合わせフォーム（Googleフォーム等）のURL。空欄なら「準備中」と表示。
+contact_form_url: ""
+
+# -------------------------------------------------------------
+#  以下は通常変更不要
+# -------------------------------------------------------------
+permalink: /posts/:year/:month/:day/:title/
+markdown: kramdown
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+defaults:
+  - scope: { path: "", type: posts }
+    values: { layout: post }
+  - scope: { path: "" }
+    values: { layout: default }
+
+exclude:
+  - inbox/
+  - scripts/
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - vendor/
+  - .gitignore
