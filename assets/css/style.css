@@ -52,3 +52,4 @@ main.wrap { padding-top: 20px; padding-bottom: 40px; }
 .disclosure { margin: 0 0 12px; }
 .footer-nav a { margin-right: 12px; color: var(--muted); }
 .copyright { margin: 12px 0 0; }
+.tool-banner a { display: block; padding: 10px 12px; background: var(--card); border: 1px solid var(--accent); border-radius: 8px; font-weight: 700; text-decoration: none; }

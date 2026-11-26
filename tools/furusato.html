@@ -1,0 +1,214 @@
+---
+layout: default
+title: ふるさと納税 控除上限額シミュレーター【2026年（令和8年）改正対応】
+description: 年収と家族構成を入れるだけで、2026年（令和8年）に寄付するふるさと納税の控除上限額の目安を計算します。令和8年度税制改正（基礎控除・給与所得控除の引き上げ）に対応。登録不要・無料。
+permalink: /tools/furusato/
+---
+{%- assign aff = site.affiliate -%}
+{%- assign rakuten_furusato = "https://event.rakuten.co.jp/furusato/" -%}
+{%- if aff.rakuten_id != "" -%}
+  {%- capture rakuten_link -%}https://hb.afl.rakuten.co.jp/hgc/{{ aff.rakuten_id }}/?pc={{ rakuten_furusato | cgi_escape }}{%- endcapture -%}
+{%- else -%}
+  {%- assign rakuten_link = rakuten_furusato -%}
+{%- endif -%}
+<article class="page tool">
+  {% include pr-label.html %}
+  <h1 class="post-title">ふるさと納税 控除上限額シミュレーター</h1>
+  <p class="tool-lead">2026年（令和8年）1〜12月に寄付する分の、<strong>自己負担2,000円で済む寄付額の上限の目安</strong>を計算します。令和8年度税制改正（基礎控除・給与所得控除の引き上げ）を反映しています。入力内容はこの端末の中だけで計算し、どこにも送信しません。</p>
+
+  <form id="calc" class="tool-form" onsubmit="return false">
+    <label>給与の年収（額面）
+      <span class="field"><input id="income" type="number" inputmode="numeric" min="0" step="1" value="500"> 万円</span>
+    </label>
+
+    <label>社会保険料（年間）
+      <span class="field"><input id="shaho" type="number" inputmode="numeric" min="0" step="0.1" placeholder="空欄なら年収の15%で概算"> 万円</span>
+      <small>源泉徴収票の「社会保険料等の金額」があればその数字を。空欄なら年収×15%で計算します。</small>
+    </label>
+
+    <label class="check"><input id="spouse" type="checkbox"> 配偶者控除を受けている（配偶者の年収が約123万円以下）</label>
+
+    <fieldset>
+      <legend>扶養している家族の人数（配偶者以外）</legend>
+      <label>16〜18歳・23〜69歳 <span class="field"><input id="dep_general" type="number" min="0" step="1" value="0"> 人</span></label>
+      <label>19〜22歳（大学生など） <span class="field"><input id="dep_special" type="number" min="0" step="1" value="0"> 人</span></label>
+      <label>70歳以上（同居の親・祖父母） <span class="field"><input id="dep_old_live" type="number" min="0" step="1" value="0"> 人</span></label>
+      <label>70歳以上（上記以外） <span class="field"><input id="dep_old" type="number" min="0" step="1" value="0"> 人</span></label>
+      <small>15歳以下の子どもは扶養控除がないため、上限額に影響しません。</small>
+    </fieldset>
+
+    <label>その他の所得控除（年間）
+      <span class="field"><input id="other" type="number" inputmode="numeric" min="0" step="0.1" value="0"> 万円</span>
+      <small>iDeCo・生命保険料控除・医療費控除などの合計。わからなければ0のままでOK。</small>
+    </label>
+  </form>
+
+  <section class="tool-result" aria-live="polite">
+    <p class="result-label">控除上限額の目安</p>
+    <p class="result-value"><span id="limit">—</span><span class="unit">円</span></p>
+    <p id="result-note" class="result-note"></p>
+    <a class="btn btn-rakuten" href="{{ rakuten_link }}" target="_blank" rel="sponsored noopener">楽天ふるさと納税で返礼品を探す</a>
+    <details class="breakdown">
+      <summary>計算の内訳</summary>
+      <table>
+        <tbody id="breakdown"></tbody>
+      </table>
+    </details>
+  </section>
+
+  <div class="post-body">
+    <h2>使い方と注意点</h2>
+    <ul>
+      <li>表示されるのは<strong>目安</strong>です。社会保険料の実額、住宅ローン控除、医療費控除などで実際の上限は変わります。上限ぎりぎりは避け、<strong>少し余裕を持たせた額</strong>で寄付するのがおすすめです。</li>
+      <li>会社員で、寄付先が5自治体以内なら「ワンストップ特例」で確定申告なしで控除を受けられます（寄付ごとに申請書の提出が必要）。</li>
+      <li>住宅ローン控除を受けている場合、所得税から引ききれない分が住民税から引かれるため、上限が下がることがあります。</li>
+      <li>給与以外の所得（副業・不動産・年金など）がある人、年収2,000万円超の人は正確に計算できません。</li>
+      <li>年収は「その年（2026年1〜12月）の見込み額」で入力します。去年の源泉徴収票の金額で計算する場合は、昇給・賞与の増減を考慮してください。</li>
+    </ul>
+
+    <h2>2026年（令和8年）の改正で何が変わった？</h2>
+    <p>令和8年度税制改正で、所得税の基礎控除（合計所得489万円以下なら最大104万円）と給与所得控除の最低保障額が引き上げられました。所得税が減る人が多い一方、<strong>所得税率が下がると、ふるさと納税の上限額はわずかに下がる</strong>ことがあります。去年と同じ額を寄付する予定の人は、念のため計算し直しておくと安心です。</p>
+
+    <h2>計算方法</h2>
+    <p>総務省が示している次の式で計算しています。</p>
+    <p class="formula">上限額 ＝ 住民税所得割額 × 20% ÷（90% − 所得税率 × 1.021）＋ 2,000円</p>
+    <p>給与所得控除・基礎控除・配偶者控除・扶養控除・調整控除は2026年分の税制に合わせて計算し、住民税は標準税率（10%）を前提にしています。</p>
+    <p class="updated">最終更新：2026年11月26日</p>
+  </div>
+</article>
+
+<style>
+.tool-lead { font-size: .95rem; }
+.tool-form { display: grid; gap: 14px; margin: 20px 0; padding: 16px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
+.tool-form label { display: grid; gap: 4px; font-weight: 700; font-size: .95rem; }
+.tool-form label.check { display: flex; gap: 8px; align-items: flex-start; font-weight: 400; }
+.tool-form label.check input { margin-top: .45em; }
+.tool-form fieldset { border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px 12px; display: grid; gap: 8px; }
+.tool-form legend { font-weight: 700; font-size: .95rem; padding: 0 4px; }
+.tool-form fieldset label { font-weight: 400; grid-template-columns: 1fr auto; align-items: center; }
+.tool-form .field { display: inline-flex; align-items: center; gap: 6px; font-weight: 400; }
+.tool-form input[type=number] { width: 9em; max-width: 100%; padding: 8px 10px; font-size: 1rem; border: 1px solid var(--line); border-radius: 6px; background: #fff; color: var(--fg); }
+.tool-form fieldset input[type=number] { width: 4.5em; }
+.tool-form small { font-weight: 400; color: var(--muted); font-size: .8rem; line-height: 1.6; }
+.tool-result { margin: 20px 0; padding: 20px 16px; background: var(--card); border: 2px solid var(--accent); border-radius: 10px; text-align: center; }
+.result-label { margin: 0; color: var(--muted); font-size: .9rem; }
+.result-value { margin: 0; font-size: 2.2rem; font-weight: 700; color: var(--accent); line-height: 1.4; }
+.result-value .unit { font-size: 1rem; margin-left: 4px; }
+.result-note { font-size: .85rem; color: var(--muted); margin: 4px 0 16px; }
+.tool-result .btn { display: block; max-width: 360px; margin: 0 auto; }
+.breakdown { text-align: left; margin-top: 16px; font-size: .85rem; }
+.breakdown summary { cursor: pointer; color: var(--accent); }
+.breakdown table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+.breakdown td { padding: 4px 0; border-bottom: 1px solid var(--line); }
+.breakdown td:last-child { text-align: right; white-space: nowrap; padding-left: 8px; }
+.formula { padding: 10px 12px; background: var(--card); border: 1px solid var(--line); border-radius: 6px; font-size: .9rem; }
+.updated { color: var(--muted); font-size: .8rem; }
+</style>
+
+<script>
+(function () {
+  var MAN = 10000;
+  var $ = function (id) { return document.getElementById(id); };
+  var num = function (id) { var v = parseFloat($(id).value); return isFinite(v) && v > 0 ? v : 0; };
+  var cnt = function (id) { return Math.floor(num(id)); };
+  var yen = function (v) { return Math.round(v).toLocaleString('ja-JP') + '円'; };
+
+  // 給与所得控除（2026年分）。所得税は最低保障74万円（令和8・9年分の特例込み）、住民税は69万円で概算。
+  function kyuyoKojo(s, minimum) {
+    var k;
+    if (s <= 1900000) k = 650000;
+    else if (s <= 3600000) k = s * 0.3 + 80000;
+    else if (s <= 6600000) k = s * 0.2 + 440000;
+    else if (s <= 8500000) k = s * 0.1 + 1100000;
+    else k = 1950000;
+    return Math.min(s, Math.max(k, minimum));
+  }
+
+  // 所得税の基礎控除（2026年分）
+  function kisoShotoku(g) {
+    if (g <= 4890000) return 1040000;
+    if (g <= 6550000) return 670000;
+    if (g <= 23500000) return 620000;
+    if (g <= 24000000) return 480000;
+    if (g <= 24500000) return 320000;
+    if (g <= 25000000) return 160000;
+    return 0;
+  }
+  // 住民税の基礎控除
+  function kisoJumin(g) {
+    if (g <= 24000000) return 430000;
+    if (g <= 24500000) return 290000;
+    if (g <= 25000000) return 150000;
+    return 0;
+  }
+  // 配偶者控除 [所得税, 住民税]（本人の合計所得で逓減）
+  function haigusha(g) {
+    if (g <= 9000000) return [380000, 330000];
+    if (g <= 9500000) return [260000, 220000];
+    if (g <= 10000000) return [130000, 110000];
+    return [0, 0];
+  }
+  function shotokuRate(t) {
+    if (t <= 1950000) return 0.05;
+    if (t <= 3300000) return 0.10;
+    if (t <= 6950000) return 0.20;
+    if (t <= 9000000) return 0.23;
+    if (t <= 18000000) return 0.33;
+    if (t <= 40000000) return 0.40;
+    return 0.45;
+  }
+
+  function calc() {
+    var salary = num('income') * MAN;
+    var shaho = $('shaho').value === '' ? salary * 0.15 : num('shaho') * MAN;
+    var other = num('other') * MAN;
+    var dg = cnt('dep_general'), ds = cnt('dep_special'), dol = cnt('dep_old_live'), dot = cnt('dep_old');
+
+    var gIncomeTax = Math.max(0, salary - kyuyoKojo(salary, 740000));
+    var gJumin = Math.max(0, salary - kyuyoKojo(salary, 690000));
+
+    var sp = $('spouse').checked ? haigusha(gJumin) : [0, 0];
+    var depTax = dg * 380000 + ds * 630000 + dol * 580000 + dot * 480000;
+    var depJumin = dg * 330000 + ds * 450000 + dol * 450000 + dot * 380000;
+
+    var kisoT = kisoShotoku(gIncomeTax), kisoJ = kisoJumin(gJumin);
+    var taxableT = Math.floor(Math.max(0, gIncomeTax - shaho - other - kisoT - sp[0] - depTax) / 1000) * 1000;
+    var taxableJ = Math.floor(Math.max(0, gJumin - shaho - other - kisoJ - sp[1] - depJumin) / 1000) * 1000;
+
+    // 調整控除（人的控除の差額）
+    var spDiff = sp[1] === 330000 ? 50000 : sp[1] === 220000 ? 40000 : sp[1] === 110000 ? 20000 : 0;
+    var diff = (gJumin <= 25000000 ? 50000 : 0) + spDiff + dg * 50000 + ds * 180000 + dol * 130000 + dot * 100000;
+    var adj = 0;
+    if (gJumin <= 25000000 && taxableJ > 0) {
+      if (taxableJ <= 2000000) adj = Math.min(diff, taxableJ) * 0.05;
+      else adj = Math.max((diff - (taxableJ - 2000000)) * 0.05, 2500);
+    }
+    var shotokuwari = Math.max(0, taxableJ * 0.1 - adj);
+    var rate = taxableT > 0 ? shotokuRate(taxableT) : 0;
+
+    var limit = shotokuwari > 0 ? shotokuwari * 0.2 / (0.9 - rate * 1.021) + 2000 : 0;
+    var shown = Math.floor(limit / 1000) * 1000;
+
+    $('limit').textContent = salary > 0 ? shown.toLocaleString('ja-JP') : '—';
+    var note = '';
+    if (salary > 20000000) note = '年収2,000万円超は確定申告が必要なため、この計算は参考程度にしてください。';
+    else if (shown <= 2000 && salary > 0) note = '住民税の所得割がかからない見込みのため、ふるさと納税による節税効果はほぼありません。';
+    else if (salary > 0) note = '寄付額の目安：' + (Math.floor(shown * 0.9 / 1000) * 1000).toLocaleString('ja-JP') + '円くらいまでにしておくと安心です。';
+    $('result-note').textContent = note;
+
+    var rows = [
+      ['給与所得（住民税）', yen(gJumin)],
+      ['社会保険料', yen(shaho)],
+      ['住民税の課税所得', yen(taxableJ)],
+      ['住民税 所得割額', yen(shotokuwari)],
+      ['所得税の課税所得', yen(taxableT)],
+      ['所得税率', rate ? Math.round(rate * 100) + '%' : '0%（所得税なし）']
+    ];
+    $('breakdown').innerHTML = rows.map(function (r) { return '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td></tr>'; }).join('');
+  }
+
+  $('calc').addEventListener('input', calc);
+  $('calc').addEventListener('change', calc);
+  calc();
+})();
+</script>
