@@ -1,0 +1,114 @@
+---
+layout: default
+title: 医療費控除シミュレーター【いくら戻る？セルフメディケーション税制と比較】
+description: 1年間に払った医療費から、医療費控除で所得税・住民税がいくら戻るかを計算します。セルフメディケーション税制（市販薬の控除）とどちらが得かも比較。2026年（令和8年）の税制に対応。
+permalink: /tools/iryohi/
+---
+<article class="page tool">
+  <nav class="crumbs"><a href="{{ '/' | relative_url }}">ホーム</a> › <a href="{{ '/tools/' | relative_url }}">計算ツール</a></nav>
+  <h1 class="post-title">医療費控除シミュレーター</h1>
+  <p class="tool-lead">1年間（1〜12月）に家族で払った医療費から、<strong>確定申告でいくら税金が戻るか</strong>を計算します。市販薬の控除（セルフメディケーション税制）とどちらが得かも比べられます。入力内容はこの端末の中だけで計算し、どこにも送信しません。</p>
+
+  <form id="calc" class="tool-form" onsubmit="return false">
+    <label>申告する人の給与年収（額面）
+      <span class="field"><input id="income" type="number" inputmode="numeric" min="0" step="1" value="500"> 万円</span>
+      <small>家族の医療費は、所得の多い人がまとめて申告すると戻る額が大きくなりやすいです。</small>
+    </label>
+    <label>1年間に払った医療費の合計
+      <span class="field"><input id="paid" type="number" inputmode="numeric" min="0" step="1000" value="150000"> 円</span>
+      <small>生計を同じくする家族の分も合計できます。通院の交通費（電車・バス）も含められます。</small>
+    </label>
+    <label>保険金などで補てんされた額
+      <span class="field"><input id="covered" type="number" inputmode="numeric" min="0" step="1000" value="0"> 円</span>
+      <small>高額療養費、生命保険の入院給付金、出産育児一時金など。</small>
+    </label>
+    <label>対象の市販薬の購入額（セルフメディケーション税制と比較する場合）
+      <span class="field"><input id="otc" type="number" inputmode="numeric" min="0" step="1000" value="0"> 円</span>
+      <small>レシートに★や「控除対象」と書かれた市販薬。健康診断などを受けていることが条件です。</small>
+    </label>
+  </form>
+
+  <section class="tool-result" aria-live="polite">
+    <p class="result-label">戻ってくる税金の目安（医療費控除）</p>
+    <p class="result-value"><span id="refund">—</span><span class="unit">円</span></p>
+    <p id="result-note" class="result-note"></p>
+    <table class="result-table"><tbody id="breakdown"></tbody></table>
+  </section>
+
+  <div class="post-body">
+    <h2>医療費控除のしくみ</h2>
+    <ul>
+      <li>控除額 ＝ 払った医療費 − 保険などで補てんされた額 − <strong>10万円</strong>（所得が200万円未満の人は「所得×5%」）。上限は200万円です。</li>
+      <li>控除額に<strong>所得税率（5〜45%）と住民税率（10%）</strong>をかけた分、税金が安くなります。所得税は確定申告で還付され、住民税は翌年6月からの分が安くなります。</li>
+      <li>会社員でも<strong>年末調整では受けられず、確定申告が必要</strong>です。5年前の分までさかのぼって申告できます。</li>
+    </ul>
+
+    <h2>セルフメディケーション税制とは</h2>
+    <ul>
+      <li>対象の市販薬の購入額から<strong>1万2,000円</strong>を引いた額（上限8万8,000円）を控除できる制度です。</li>
+      <li>医療費控除とは<strong>どちらか一方しか使えません</strong>。病院代が少なく市販薬をよく買う年は、こちらが得なことがあります。</li>
+    </ul>
+
+    <h2>対象になるもの・ならないもの（例）</h2>
+    <ul>
+      <li><strong>なる</strong>：診察・治療費、処方薬、入院費、出産費用、歯の治療（一般的なもの）、通院の電車・バス代、治療目的のマッサージ・はり・きゅう</li>
+      <li><strong>ならない</strong>：健康診断・人間ドック（病気が見つかり治療した場合を除く）、予防接種、美容目的の治療、自家用車のガソリン代・駐車場代、ビタミン剤など</li>
+    </ul>
+    <p class="updated">最終更新：2026年11月26日</p>
+  </div>
+  {% include related-tools.html %}
+</article>
+
+<script src="{{ '/assets/js/tax2026.js' | relative_url }}"></script>
+<script>
+(function () {
+  var MAN = 10000;
+  var $ = function (id) { return document.getElementById(id); };
+  var num = function (id) { var v = parseFloat($(id).value); return isFinite(v) && v > 0 ? v : 0; };
+  var yen = function (v) { return Math.round(v).toLocaleString('ja-JP') + '円'; };
+
+  function saving(base, deduction) {
+    if (deduction <= 0) return { income: 0, jumin: 0, total: 0 };
+    var t0 = Tax2026.taxes(base);
+    var t1 = Tax2026.taxes(Object.assign({}, base, { other: deduction }));
+    var a = t0.incomeTax - t1.incomeTax, b = t0.shotokuwari - t1.shotokuwari;
+    return { income: a, jumin: b, total: a + b };
+  }
+
+  function calc() {
+    var salary = num('income') * MAN;
+    if (salary <= 0) { $('refund').textContent = '—'; $('breakdown').innerHTML = ''; $('result-note').textContent = ''; return; }
+    var si = Tax2026.socialInsurance({ monthly: salary / 12, bonus: 0, age40to64: false });
+    var base = { salary: salary, shaho: si.total };
+    var t = Tax2026.taxes(base);
+
+    var threshold = Math.min(100000, Math.floor(t.gIncomeTax * 0.05));
+    var med = Math.min(2000000, Math.max(0, num('paid') - num('covered') - threshold));
+    var otcDed = Math.min(88000, Math.max(0, num('otc') - 12000));
+    var s1 = saving(base, med), s2 = saving(base, otcDed);
+
+    $('refund').textContent = Math.round(s1.total).toLocaleString('ja-JP');
+    var note;
+    if (med <= 0) note = '医療費が足切り額（' + yen(threshold) + '）以下のため、医療費控除は受けられません。';
+    else note = '所得税は確定申告で還付、住民税は翌年度の分が安くなります。';
+    if (num('otc') > 0) {
+      note += s2.total > s1.total ? ' → セルフメディケーション税制のほうが約' + yen(s2.total - s1.total) + '得です。'
+        : (s1.total > 0 ? ' → 医療費控除のほうが得です。' : '');
+    }
+    $('result-note').textContent = note;
+    var rows = [
+      ['足切り額（10万円または所得×5%）', yen(threshold)],
+      ['医療費控除の額', yen(med)],
+      ['所得税の還付（目安）', yen(s1.income)],
+      ['住民税の軽減（目安）', yen(s1.jumin)]
+    ];
+    if (num('otc') > 0) rows.push(['参考：セルフメディケーション税制の場合', yen(s2.total) + '（控除額 ' + yen(otcDed) + '）']);
+    rows.push(['医療費控除で戻る合計', yen(s1.total)]);
+    $('breakdown').innerHTML = rows.map(function (x) { return '<tr><td>' + x[0] + '</td><td>' + x[1] + '</td></tr>'; }).join('');
+  }
+
+  $('calc').addEventListener('input', calc);
+  $('calc').addEventListener('change', calc);
+  calc();
+})();
+</script>
