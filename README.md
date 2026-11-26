@@ -74,11 +74,27 @@ python3 scripts/process_inbox.py
 これで次の処理が行われます。
 
 1. 写真から **位置情報（GPS）を含むメタデータ（EXIF）をすべて削除**（向きだけは画素に反映して保持）
-2. 長辺 1200px に縮小して `assets/images/posts/<フォルダ名>/1.jpg, 2.jpg …` に保存
-3. `_posts/<今日の日付>-<フォルダ名>.md` に記事を作成
+2. 長辺 1200px に縮小
+3. 写真の中央やや下に、半透明の小さな透かし「© qsuke33」を入れる（盗用対策）
+4. `assets/images/posts/<フォルダ名>/1.jpg, 2.jpg …` に保存
+5. `_posts/<今日の日付>-<フォルダ名>.md` に記事を作成
 
 - 一部だけ処理: `python3 scripts/process_inbox.py wireless-charger`
 - 作り直し（メモを直したとき）: `python3 scripts/process_inbox.py --force wireless-charger`
+- 透かしなしにしたいとき: `python3 scripts/process_inbox.py --no-watermark wireless-charger`
+- 透かしの文字・濃さ・位置は `scripts/process_inbox.py` 冒頭の `WATERMARK_...` で変えられます。
+
+## 写真の盗用対策
+
+Web に表示した写真のコピーを完全に防ぐ方法はないため、次の2段構えにしています。
+
+1. **透かし**：端ではなく商品の近く（中央やや下）に小さく入れるので、切り取って使いにくくなります。
+2. **元の写真を手元に保管**：サイトに載るのは縮小版だけです。大きいサイズ・撮影情報付きの元写真は、
+   自分が撮影した決定的な証拠になります。**元写真は消さずに保管してください**（inbox はコミットされないので、
+   スマホやPC、クラウドストレージなどに残しておく）。
+
+盗用を見つけたら（Google レンズで自分の写真を画像検索すると見つかることがあります）、
+元写真を証拠に、Google（著作権侵害による削除申し立て）や相手サイトの運営会社へ削除を依頼できます。
 
 ### 4. 確認して公開
 

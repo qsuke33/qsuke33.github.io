@@ -6,10 +6,12 @@
     python3 scripts/process_inbox.py            # inbox 内の未処理フォルダをすべて処理
     python3 scripts/process_inbox.py my-item    # 指定したフォルダだけ処理
     python3 scripts/process_inbox.py --force my-item   # 既存の記事・写真を上書き
+    python3 scripts/process_inbox.py --no-watermark my-item  # 透かしを入れない
 
 やること:
   1. inbox/<フォルダ名>/ の写真から位置情報などのメタデータ(EXIF)を完全に消す
-  2. 長辺 MAX_SIZE px に縮小して JPEG で assets/images/posts/<フォルダ名>/ に保存
+  2. 長辺 MAX_SIZE px に縮小し、控えめな透かし（WATERMARK_TEXT）を入れて
+     JPEG で assets/images/posts/<フォルダ名>/ に保存
   3. memo.txt の内容から _posts/<日付>-<フォルダ名>.md を作る
      感想はメモに書いた文章をそのまま本文にする（文章を足したり作ったりしない）
 """
@@ -20,7 +22,7 @@ import sys
 from pathlib import Path
 
 try:
-    from PIL import Image, ImageOps
+    from PIL import Image, ImageDraw, ImageFont, ImageOps
 except ImportError:
     sys.exit("Pillow が必要です: pip install Pillow")
 
@@ -38,6 +40,13 @@ IMAGES = ROOT / "assets" / "images" / "posts"
 
 MAX_SIZE = 1200      # 長辺の最大ピクセル
 JPEG_QUALITY = 80
+
+# ---- 透かし（盗用対策）。商品の近く＝中央寄りに小さく半透明で1か所だけ入れる ----
+WATERMARK_TEXT = "© qsuke33"
+WATERMARK_SIZE = 0.045     # 文字の高さ（写真の短辺に対する割合）
+WATERMARK_OPACITY = 0.40   # 濃さ（0=見えない 〜 1=くっきり）
+WATERMARK_X = 0.50         # 横位置（0=左端 〜 1=右端）※文字の中心
+WATERMARK_Y = 0.62         # 縦位置（0=上端 〜 1=下端）※中央やや下＝切り取りにくい位置
 PHOTO_EXT = {".jpg", ".jpeg", ".png", ".webp", ".heic", ".heif"}
 SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 JST = dt.timezone(dt.timedelta(hours=9))
@@ -77,7 +86,26 @@ def clean_rakuten(url):
     return url.split("#")[0]
 
 
-def process_photo(src, dst):
+def add_watermark(im):
+    """白文字＋うっすら影の半透明テキストを1か所に入れる（明るい写真でも暗い写真でも読める）。"""
+    short = min(im.size)
+    font = ImageFont.load_default(size=max(12, round(short * WATERMARK_SIZE)))
+    layer = Image.new("RGBA", im.size, (0, 0, 0, 0))
+    draw = ImageDraw.Draw(layer)
+    left, top, right, bottom = draw.textbbox((0, 0), WATERMARK_TEXT, font=font)
+    w, h = right - left, bottom - top
+    x = round(im.width * WATERMARK_X - w / 2) - left
+    y = round(im.height * WATERMARK_Y - h / 2) - top
+    x = min(max(x, 0), im.width - w)
+    y = min(max(y, 0), im.height - h)
+    a = round(255 * WATERMARK_OPACITY)
+    off = max(1, round(h * 0.06))
+    draw.text((x + off, y + off), WATERMARK_TEXT, font=font, fill=(0, 0, 0, a // 2))
+    draw.text((x, y), WATERMARK_TEXT, font=font, fill=(255, 255, 255, a))
+    return Image.alpha_composite(im.convert("RGBA"), layer).convert(im.mode if im.mode == "L" else "RGB")
+
+
+def process_photo(src, dst, watermark=True):
     with Image.open(src) as im:
         im = ImageOps.exif_transpose(im)  # 回転情報を画素に反映してから EXIF を捨てる
         if im.mode not in ("RGB", "L"):
@@ -86,6 +114,8 @@ def process_photo(src, dst):
             bg.paste(rgba, mask=rgba.split()[-1])
             im = bg
         im.thumbnail((MAX_SIZE, MAX_SIZE), Image.LANCZOS)
+        if watermark and WATERMARK_TEXT:
+            im = add_watermark(im)
         # 画素だけを新しい画像にコピー → EXIF/GPS/XMP/コメント等を一切持ち越さない
         clean = Image.frombytes(im.mode, im.size, im.tobytes())
     dst.parent.mkdir(parents=True, exist_ok=True)
@@ -101,7 +131,7 @@ def yaml_str(s):
     return '"' + s.replace("\\", "\\\\").replace('"', '\\"') + '"'
 
 
-def process_folder(folder, force=False):
+def process_folder(folder, force=False, watermark=True):
     slug = folder.name
     if not SLUG_RE.match(slug):
         print(f"× {slug}: フォルダ名は半角英小文字・数字・ハイフンにしてください（例: usb-charger）")
@@ -136,9 +166,9 @@ def process_folder(folder, force=False):
     urls = {}
     for i, p in enumerate(photos, 1):
         dst = out_dir / f"{i}.jpg"
-        process_photo(p, dst)
+        process_photo(p, dst, watermark)
         urls[p.name] = f"/assets/images/posts/{slug}/{i}.jpg"
-        print(f"  写真 {p.name} → {dst.relative_to(ROOT)}（EXIF削除・縮小済み）")
+        print(f"  写真 {p.name} → {dst.relative_to(ROOT)}（EXIF削除・縮小" + ("・透かし" if watermark else "") + "済み）")
 
     alt = meta.get("product", meta["title"])
     used = set()
@@ -189,6 +219,7 @@ def main():
     ap = argparse.ArgumentParser(description="inbox の写真とメモから記事を作る")
     ap.add_argument("folders", nargs="*", help="処理するフォルダ名（省略時はすべて）")
     ap.add_argument("--force", action="store_true", help="既存の記事・写真を上書き")
+    ap.add_argument("--no-watermark", action="store_true", help="透かしを入れない")
     args = ap.parse_args()
 
     if args.folders:
@@ -203,7 +234,7 @@ def main():
         if not t.is_dir():
             print(f"× {t.name}: inbox/{t.name} が見つかりません")
             continue
-        process_folder(t, force=args.force)
+        process_folder(t, force=args.force, watermark=not args.no_watermark)
 
 
 if __name__ == "__main__":
