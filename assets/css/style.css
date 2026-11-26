@@ -89,3 +89,17 @@ main.wrap { padding-top: 20px; padding-bottom: 40px; }
 .tool-list a:hover { border-color: var(--accent); }
 .tool-list strong { display: block; color: var(--accent); }
 .tool-list span { font-size: .85rem; color: var(--muted); }
+.tool-form select { width: 100%; max-width: 360px; padding: 8px 10px; font-size: 1rem; border: 1px solid var(--line); border-radius: 6px; background: #fff; color: var(--fg); font-weight: 400; }
+.verdicts { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 8px; text-align: left; }
+.verdicts li { padding: 10px 12px; border-radius: 8px; font-size: .9rem; line-height: 1.6; background: #eef6f2; }
+.verdicts li.v-over { background: #fdecea; }
+.verdicts li.v-warn { background: var(--pr-bg); }
+.v-mark { display: inline-block; margin-right: 8px; padding: 0 8px; border-radius: 999px; font-size: .75rem; font-weight: 700; background: var(--accent); color: #fff; }
+.v-over .v-mark { background: #b3261e; }
+.v-warn .v-mark { background: var(--pr-fg); }
+.table-scroll { overflow-x: auto; }
+.kabe-table { width: 100%; border-collapse: collapse; font-size: .88rem; line-height: 1.6; }
+.kabe-table th, .kabe-table td { padding: 8px 6px; border-bottom: 1px solid var(--line); vertical-align: top; text-align: left; }
+.kabe-table th { background: var(--card); }
+.kabe-table td:first-child { white-space: nowrap; }
+.kabe-table td:last-child { white-space: nowrap; color: var(--muted); }
