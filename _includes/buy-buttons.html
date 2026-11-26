@@ -1,0 +1,25 @@
+{%- comment -%}
+  記事の front matter の amazon_asin / amazon_url / rakuten_url から購入ボタンを作る。
+  アフィリエイトIDは _config.yml の affiliate: だけで管理する。
+{%- endcomment -%}
+{%- assign aff = site.affiliate -%}
+{%- if page.amazon_asin or page.amazon_url or page.rakuten_url -%}
+<div class="buy-buttons">
+  {%- if page.amazon_asin -%}
+    {%- capture amz -%}https://www.amazon.co.jp/dp/{{ page.amazon_asin }}/{% if aff.amazon_tag != "" %}?tag={{ aff.amazon_tag }}{% endif %}{%- endcapture -%}
+  {%- elsif page.amazon_url -%}
+    {%- assign amz = page.amazon_url -%}
+  {%- endif -%}
+  {%- if amz -%}
+  <a class="btn btn-amazon" href="{{ amz }}" target="_blank" rel="sponsored noopener">Amazonで見る</a>
+  {%- endif -%}
+  {%- if page.rakuten_url -%}
+    {%- if aff.rakuten_id != "" -%}
+      {%- capture rkt -%}https://hb.afl.rakuten.co.jp/hgc/{{ aff.rakuten_id }}/?pc={{ page.rakuten_url | cgi_escape }}{%- endcapture -%}
+    {%- else -%}
+      {%- assign rkt = page.rakuten_url -%}
+    {%- endif -%}
+  <a class="btn btn-rakuten" href="{{ rkt }}" target="_blank" rel="sponsored noopener">楽天市場で見る</a>
+  {%- endif -%}
+</div>
+{%- endif -%}

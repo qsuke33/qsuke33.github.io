@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="{{ site.lang | default: 'ja' }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+  {% seo %}
+  {% feed_meta %}
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="site-title" href="{{ '/' | relative_url }}">{{ site.title }}</a>
+      <nav class="site-nav">
+        <a href="{{ '/profile/' | relative_url }}">プロフィール</a>
+        <a href="{{ '/contact/' | relative_url }}">お問い合わせ</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    {{ content }}
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      {% include disclosure.html %}
+      <nav class="footer-nav">
+        <a href="{{ '/profile/' | relative_url }}">プロフィール</a>
+        <a href="{{ '/privacy/' | relative_url }}">プライバシーポリシー</a>
+        <a href="{{ '/contact/' | relative_url }}">お問い合わせ</a>
+      </nav>
+      <p class="copyright">&copy; {{ 'now' | date: '%Y' }} {{ site.author }}</p>
+    </div>
+  </footer>
+</body>
+</html>
