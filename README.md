@@ -1,6 +1,6 @@
-# qsuke33の買ってよかったもの
+# 年収400万で4000万貯めた人のお金ツール（qsuke33.github.io）
 
-実際に購入した商品のレビューサイトです。GitHub Pages（Jekyll）で <https://qsuke33.github.io> に公開します。
+お金の計算ツールと、実際に購入した商品のレビューのサイトです。GitHub Pages（Jekyll）で <https://qsuke33.github.io> に公開します。
 
 - 記事は `_posts/` に置くだけで、トップページの一覧に新しい順で自動表示されます。
 - 全記事の冒頭に「広告・PR」、全ページのフッターに Amazon アソシエイトの表記が自動で入ります。
