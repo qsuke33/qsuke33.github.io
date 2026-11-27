@@ -76,12 +76,14 @@
   /*
    * o: { salary, shaho, other, spouse(bool), dg, ds, dol, dot }
    *   dg: 一般扶養 ds: 特定扶養(19〜22歳) dol: 同居老親等 dot: その他の老人扶養
+   *   extra: 給与以外の所得（副業の雑所得・事業所得など。売上−経費の額）
    */
   function taxes(o) {
     var salary = o.salary, shaho = o.shaho, other = o.other || 0;
     var dg = o.dg || 0, ds = o.ds || 0, dol = o.dol || 0, dot = o.dot || 0;
-    var gT = Math.max(0, salary - kyuyoKojo(salary, 740000));
-    var gJ = Math.max(0, salary - kyuyoKojo(salary, 690000));
+    var extra = o.extra || 0;
+    var gT = Math.max(0, salary - kyuyoKojo(salary, 740000)) + extra;
+    var gJ = Math.max(0, salary - kyuyoKojo(salary, 690000)) + extra;
     var sp = o.spouse ? haigusha(gJ) : [0, 0, 0];
     var depT = dg * 380000 + ds * 630000 + dol * 580000 + dot * 480000;
     var depJ = dg * 330000 + ds * 450000 + dol * 450000 + dot * 380000;

@@ -112,3 +112,4 @@ main.wrap { padding-top: 20px; padding-bottom: 40px; }
 .offer { margin-bottom: 12px; text-align: center; }
 .offer .btn { display: block; max-width: 360px; margin: 0 auto; }
 .offer-note { margin: 4px 0 0; font-size: .8rem; color: var(--muted); }
+.section-title { font-size: 1.1rem; margin: 24px 0 12px; }

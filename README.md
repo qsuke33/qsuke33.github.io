@@ -123,7 +123,9 @@ git push
 | `profile.md`, `privacy.md`, `contact.md` | 固定ページ |
 | `scripts/process_inbox.py` | inbox → 記事 の変換スクリプト |
 | `inbox/` | 写真とメモの置き場（コミットされない） |
-| `tools/` | 計算ツール（手取り・ふるさと納税）。一覧は `/tools/` |
+| `tools/` | 計算ツールの各ページ。一覧は `/tools/` |
+| `_data/tools.yml` | 計算ツールの一覧（トップ・/tools/・関連リンクに反映。ツールを足したらここにも追加） |
+| `_data/offers.yml` | 計算ツールに出す広告（A8.net などで提携承認されたものだけ追加） |
 | `assets/js/tax2026.js` | 計算ツール共通の税・社会保険料の計算ロジック（料率や控除額の改正時はここを直す） |
 
 ## 計算ツールについて
