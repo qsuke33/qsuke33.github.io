@@ -1,0 +1,100 @@
+---
+layout: default
+title: 退職金の税金・手取りシミュレーター【退職所得控除を自動計算】
+description: 退職金の額と勤続年数から、退職所得控除・所得税・住民税・手取り額を計算します。勤続5年以下の短期退職手当や、申告書を出さなかった場合の源泉徴収（20.42%）との比較にも対応。
+permalink: /tools/taishokukin/
+---
+<article class="page tool">
+  <nav class="crumbs"><a href="{{ '/' | relative_url }}">ホーム</a> › <a href="{{ '/tools/' | relative_url }}">計算ツール</a></nav>
+  <h1 class="post-title">退職金の税金・手取りシミュレーター</h1>
+  <p class="tool-lead">退職金（退職一時金）の額と勤続年数を入れると、<strong>かかる税金と手取り額</strong>を計算します。退職金は税金がとても優遇されていて、多くの人はほとんど税金がかかりません。入力内容はこの端末の中だけで計算し、どこにも送信しません。</p>
+
+  <form id="calc" class="tool-form" onsubmit="return false">
+    <label>退職金の額（額面）
+      <span class="field"><input id="amount" type="number" inputmode="numeric" min="0" step="10" value="2000"> 万円</span>
+    </label>
+    <label>勤続年数
+      <span class="field"><input id="years" type="number" inputmode="numeric" min="1" max="60" step="1" value="30"> 年</span>
+      <small>1年未満の端数は切り上げます（例：22年3か月 → 23年）。</small>
+    </label>
+    <label class="check"><input id="disabled" type="checkbox"> 障害者になったことが直接の原因で退職した</label>
+  </form>
+
+  <section class="tool-result" aria-live="polite">
+    <p class="result-label">退職金の手取り額</p>
+    <p class="result-value"><span id="net">—</span><span class="unit">円</span></p>
+    <p id="result-note" class="result-note"></p>
+    <table class="result-table"><tbody id="breakdown"></tbody></table>
+  </section>
+
+  <div class="post-body">
+    <h2>退職金の税金のしくみ</h2>
+    <p class="formula">課税される額 ＝（退職金 − 退職所得控除）× 1/2</p>
+    <ul>
+      <li><strong>退職所得控除</strong>：勤続20年以下は「40万円×勤続年数」（最低80万円）、20年を超えると「800万円＋70万円×（勤続年数−20年）」。</li>
+      <li>控除を引いた残りの<strong>半分だけ</strong>に税金がかかり、給与など他の所得とは別に計算します（分離課税）。</li>
+      <li>勤続5年以下の場合、控除後の額のうち<strong>300万円を超える部分は半分になりません</strong>（短期退職手当等）。役員として5年以下勤めた場合は全額が半分になりません（このツールは役員以外を前提にしています）。</li>
+    </ul>
+
+    <h2>「退職所得の受給に関する申告書」を必ず出す</h2>
+    <p>会社にこの申告書を出せば、上の計算どおりの税金が天引きされ、<strong>確定申告は不要</strong>です。出さないと、退職金の<strong>20.42%</strong>が一律で源泉徴収されてしまいます（払いすぎた分は確定申告で戻ります）。</p>
+
+    <h2>注意点</h2>
+    <ul>
+      <li>同じ年に複数の会社から退職金を受け取る場合や、前年以前に受け取った退職金・iDeCoなどの一時金と勤続期間が重なる場合は、控除額が調整されます。</li>
+      <li>企業年金を「年金」として分割で受け取る分は、このツールの対象外です（公的年金等の雑所得になります）。</li>
+      <li>住民税は標準税率（10%）で計算しています。</li>
+    </ul>
+    <p class="updated">最終更新：2026年11月27日</p>
+  </div>
+  {% include related-tools.html %}
+</article>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var num = function (id) { var v = parseFloat($(id).value); return isFinite(v) && v > 0 ? v : 0; };
+  var yen = function (v) { return Math.round(v).toLocaleString('ja-JP') + '円'; };
+  var BRACKETS = [[1950000, 0.05, 0], [3300000, 0.10, 97500], [6950000, 0.20, 427500], [9000000, 0.23, 636000],
+    [18000000, 0.33, 1536000], [40000000, 0.40, 2796000], [Infinity, 0.45, 4796000]];
+
+  function koujo(years, disabled) {
+    var k = years <= 20 ? Math.max(800000, 400000 * years) : 8000000 + 700000 * (years - 20);
+    return k + (disabled ? 1000000 : 0);
+  }
+
+  function calc() {
+    var amount = num('amount') * 10000, years = Math.ceil(num('years'));
+    if (!amount || !years) { $('net').textContent = '—'; $('breakdown').innerHTML = ''; $('result-note').textContent = ''; return; }
+    var k = koujo(years, $('disabled').checked);
+    var rest = Math.max(0, amount - k), taxable;
+    if (years <= 5 && rest > 3000000) taxable = 1500000 + (rest - 3000000);
+    else taxable = rest / 2;
+    taxable = Math.floor(taxable / 1000) * 1000;
+
+    var b = BRACKETS.filter(function (x) { return taxable <= x[0]; })[0];
+    var incomeTax = taxable > 0 ? Math.floor((taxable * b[1] - b[2]) * 1.021) : 0;
+    var jumin = Math.floor(taxable * 0.10 / 100) * 100;
+    var net = amount - incomeTax - jumin;
+    var noForm = Math.floor(amount * 0.2042);
+
+    $('net').textContent = Math.round(net).toLocaleString('ja-JP');
+    $('result-note').textContent = taxable === 0
+      ? '退職所得控除の範囲内なので、税金はかかりません。'
+      : '税金は退職金の' + ((incomeTax + jumin) / amount * 100).toFixed(1) + '%です。';
+    var rows = [
+      ['退職所得控除', yen(k)],
+      ['課税される額（控除後' + (years <= 5 && rest > 3000000 ? '・300万円超は全額' : 'の1/2') + '）', yen(taxable)],
+      ['所得税（復興特別所得税を含む）', yen(incomeTax)],
+      ['住民税', yen(jumin)],
+      ['参考：申告書を出さなかった場合の源泉徴収', yen(noForm) + '（＋住民税）'],
+      ['手取り額', yen(net)]
+    ];
+    $('breakdown').innerHTML = rows.map(function (x) { return '<tr><td>' + x[0] + '</td><td>' + x[1] + '</td></tr>'; }).join('');
+  }
+
+  $('calc').addEventListener('input', calc);
+  $('calc').addEventListener('change', calc);
+  calc();
+})();
+</script>
