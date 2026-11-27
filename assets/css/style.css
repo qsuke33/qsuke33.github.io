@@ -123,3 +123,12 @@ main.wrap { padding-top: 20px; padding-bottom: 40px; }
 .tool-list a { display: flex; gap: 14px; align-items: center; }
 .tool-list .tool-icon { flex: 0 0 44px; width: 44px; height: 44px; border-radius: 10px; background: #eef6f2; color: var(--accent); display: flex; align-items: center; justify-content: center; }
 .tool-list .tool-text { font-size: 1rem; color: var(--fg); min-width: 0; display: block; }
+.owner { display: block; margin: 12px 0 0; padding: 16px 18px; background: #eef6f2; border: 1px solid #cfe3da; border-radius: 14px; color: var(--fg); text-decoration: none; }
+.owner strong { display: block; font-size: 1rem; line-height: 1.6; margin: 2px 0 6px; }
+.owner-label { font-size: .75rem; font-weight: 700; color: var(--accent); }
+.owner-more { font-size: .85rem; color: var(--accent); font-weight: 700; }
+.caption { margin: -8px 0 16px; font-size: .8rem; color: var(--muted); text-align: center; }
+.note { font-size: .8rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; margin-top: 32px; }
+.post-body table { width: 100%; border-collapse: collapse; font-size: .9rem; margin: 12px 0; }
+.post-body th, .post-body td { padding: 6px 8px; border-bottom: 1px solid var(--line); text-align: left; }
+.post-body td:nth-child(n+2), .post-body th:nth-child(n+2) { text-align: right; }

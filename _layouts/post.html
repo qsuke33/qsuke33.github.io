@@ -2,7 +2,7 @@
 layout: default
 ---
 <article class="post">
-  {% include pr-label.html %}
+  {% unless page.pr == false %}{% include pr-label.html %}{% endunless %}
 
   <h1 class="post-title">{{ page.title }}</h1>
   <p class="post-meta">
