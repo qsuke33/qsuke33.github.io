@@ -11,3 +11,6 @@ __pycache__/
 inbox/*
 !inbox/README.md
 !inbox/_example/
+
+# 公開前の下書き（公開リポジトリに載せない。確認後に _posts/ へ移す）
+_drafts/
