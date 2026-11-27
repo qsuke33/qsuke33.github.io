@@ -113,3 +113,13 @@ main.wrap { padding-top: 20px; padding-bottom: 40px; }
 .offer .btn { display: block; max-width: 360px; margin: 0 auto; }
 .offer-note { margin: 4px 0 0; font-size: .8rem; color: var(--muted); }
 .section-title { font-size: 1.1rem; margin: 24px 0 12px; }
+/* トップ */
+.hero { margin: 4px 0 8px; padding: 22px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; }
+.hero h1 { margin: 0 0 8px; font-size: 1.45rem; line-height: 1.45; letter-spacing: .01em; }
+.hero p { margin: 0 0 14px; color: var(--muted); font-size: .95rem; }
+.trust { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: .85rem; }
+.trust li { display: flex; align-items: center; gap: 8px; }
+.trust .icon { width: 20px; height: 20px; color: var(--accent); flex: 0 0 auto; }
+.tool-list a { display: flex; gap: 14px; align-items: center; }
+.tool-list .tool-icon { flex: 0 0 44px; width: 44px; height: 44px; border-radius: 10px; background: #eef6f2; color: var(--accent); display: flex; align-items: center; justify-content: center; }
+.tool-list .tool-text { font-size: 1rem; color: var(--fg); min-width: 0; display: block; }

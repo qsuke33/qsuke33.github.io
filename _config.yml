@@ -38,7 +38,7 @@ defaults:
   - scope: { path: "", type: posts }
     values: { layout: post }
   - scope: { path: "" }
-    values: { layout: default }
+    values: { layout: default, image: /assets/images/ogp.png }
 
 exclude:
   - inbox/
