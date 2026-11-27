@@ -21,3 +21,6 @@
 - url: /tools/loan/
   name: 住宅ローン返済シミュレーター
   summary: 毎月の返済額・総返済額と、金利が上がった場合の比較
+- url: /tools/taishokukin/
+  name: 退職金の税金・手取りシミュレーター
+  summary: 退職所得控除を自動計算し、退職金の税金と手取りを計算
