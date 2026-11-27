@@ -1,0 +1,118 @@
+---
+layout: default
+title: 副業の税金シミュレーター【20万円ルール・確定申告が必要か判定】
+description: 会社員の副業でかかる所得税・住民税の増加額を計算し、確定申告が必要か（20万円ルール）を判定します。アルバイト（給与）と業務委託・せどり・ブログなどの雑所得に対応。2026年（令和8年）の税制に対応。
+permalink: /tools/fukugyo/
+---
+<article class="page tool">
+  <nav class="crumbs"><a href="{{ '/' | relative_url }}">ホーム</a> › <a href="{{ '/tools/' | relative_url }}">計算ツール</a></nav>
+  <h1 class="post-title">副業の税金シミュレーター</h1>
+  <p class="tool-lead">会社員が副業で稼いだとき、<strong>税金がいくら増えるか</strong>と、<strong>確定申告が必要か（20万円ルール）</strong>を判定します。2026年（令和8年）の税制に対応しています。入力内容はこの端末の中だけで計算し、どこにも送信しません。</p>
+
+  <form id="calc" class="tool-form" onsubmit="return false">
+    <label>本業の給与年収（額面）
+      <span class="field"><input id="income" type="number" inputmode="numeric" min="0" step="1" value="500"> 万円</span>
+    </label>
+    <label>副業の種類
+      <select id="kind">
+        <option value="zatsu">業務委託・せどり・ブログ・アフィリエイトなど（雑所得）</option>
+        <option value="kyuyo">アルバイト・パート（給与）</option>
+      </select>
+    </label>
+    <label><span id="sales-label">副業の売上（年間）</span>
+      <span class="field"><input id="sales" type="number" inputmode="numeric" min="0" step="1" value="50"> 万円</span>
+    </label>
+    <label id="cost-wrap">副業の経費（年間）
+      <span class="field"><input id="cost" type="number" inputmode="numeric" min="0" step="1" value="10"> 万円</span>
+      <small>仕入れ代、通信費や道具代のうち副業に使った分など。</small>
+    </label>
+  </form>
+
+  <section class="tool-result" aria-live="polite">
+    <p class="result-label">副業で増える税金（年間）</p>
+    <p class="result-value"><span id="tax">—</span><span class="unit">円</span></p>
+    <ul id="verdicts" class="verdicts"></ul>
+    <table class="result-table"><tbody id="breakdown"></tbody></table>
+  </section>
+
+  <div class="post-body">
+    <h2>「20万円ルール」の正しい意味</h2>
+    <ul>
+      <li>会社で年末調整を受けている人は、副業の<strong>所得（売上−経費）が年20万円以下なら、所得税の確定申告は不要</strong>です。アルバイトの場合は、副業先の給与の額（経費は引けない）で判定します。</li>
+      <li>ただし<strong>住民税には20万円ルールがありません</strong>。確定申告をしない場合は、お住まいの市区町村に住民税の申告が必要です。</li>
+      <li>医療費控除やふるさと納税（ワンストップ特例を使わない場合）で確定申告をするときは、20万円以下の副業所得も含めて申告します。</li>
+    </ul>
+
+    <h2>会社に副業を知られたくない場合</h2>
+    <ul>
+      <li>確定申告書の住民税の欄で<strong>「自分で納付（普通徴収）」</strong>を選ぶと、副業分の住民税が本業の給与から天引きされず、自宅に納付書が届きます。</li>
+      <li>アルバイトなど給与の副業は、自治体によっては普通徴収にできず、会社の住民税額に合算されることがあります。</li>
+      <li>就業規則で副業が禁止・届出制になっていないかも確認しましょう。</li>
+    </ul>
+
+    <h2>注意点</h2>
+    <ul>
+      <li>本業の社会保険料は協会けんぽの平均料率で概算しています。扶養家族や他の控除は含めていません。</li>
+      <li>副業の所得が大きい場合は、事業所得として青色申告（最大65万円の控除）を検討する価値があります。</li>
+      <li>副業がアルバイトで、週20時間以上働くなど条件を満たすと、副業先でも社会保険に入る場合があります。</li>
+    </ul>
+    <p class="updated">最終更新：2026年11月27日</p>
+  </div>
+  {% include related-tools.html %}
+</article>
+
+<script src="{{ '/assets/js/tax2026.js' | relative_url }}"></script>
+<script>
+(function () {
+  var MAN = 10000;
+  var $ = function (id) { return document.getElementById(id); };
+  var num = function (id) { var v = parseFloat($(id).value); return isFinite(v) && v > 0 ? v : 0; };
+  var yen = function (v) { return Math.round(v).toLocaleString('ja-JP') + '円'; };
+  function item(state, text) {
+    return '<li class="v-' + state + '"><span class="v-mark">' + (state === 'over' ? '必要' : state === 'ok' ? '不要' : '注意') + '</span>' + text + '</li>';
+  }
+
+  function calc() {
+    var salary = num('income') * MAN;
+    var kind = $('kind').value;
+    $('cost-wrap').style.display = kind === 'zatsu' ? '' : 'none';
+    $('sales-label').textContent = kind === 'zatsu' ? '副業の売上（年間）' : '副業の給与（年間・額面）';
+    if (salary <= 0) { $('tax').textContent = '—'; $('verdicts').innerHTML = ''; $('breakdown').innerHTML = ''; return; }
+
+    var si = Tax2026.socialInsurance({ monthly: salary / 12, bonus: 0, age40to64: false });
+    var t0 = Tax2026.taxes({ salary: salary, shaho: si.total });
+    var side = num('sales') * MAN, profit, t1;
+    if (kind === 'zatsu') {
+      profit = Math.max(0, side - num('cost') * MAN);
+      t1 = Tax2026.taxes({ salary: salary, shaho: si.total, extra: profit });
+    } else {
+      profit = side;
+      t1 = Tax2026.taxes({ salary: salary + side, shaho: si.total });
+    }
+    var dIncome = t1.incomeTax - t0.incomeTax, dJumin = t1.juminTax - t0.juminTax;
+    $('tax').textContent = Math.round(dIncome + dJumin).toLocaleString('ja-JP');
+
+    var v = [];
+    if (profit > 200000) v.push(item('over', '所得税の確定申告が必要です（' + (kind === 'zatsu' ? '所得' : '副業の給与') + 'が20万円超）。'));
+    else if (profit > 0) {
+      v.push(item('ok', '所得税の確定申告は不要です（20万円以下）。'));
+      v.push(item('warn', 'ただし住民税の申告は必要です（お住まいの市区町村へ）。'));
+    }
+    if (profit > 0 && kind === 'zatsu') v.push(item('warn', '会社に知られたくない場合は、住民税を「自分で納付（普通徴収）」にしましょう。'));
+    if (profit > 0 && kind === 'kyuyo') v.push(item('warn', '給与の副業は、住民税が本業の会社の天引きに合算されることがあります。'));
+    $('verdicts').innerHTML = v.join('');
+
+    var rows = [
+      [kind === 'zatsu' ? '副業の所得（売上−経費）' : '副業の給与', yen(profit)],
+      ['増える所得税（復興特別所得税を含む）', yen(dIncome)],
+      ['増える住民税', yen(dJumin)],
+      ['副業の手取り（目安）', yen(profit - dIncome - dJumin)]
+    ];
+    $('breakdown').innerHTML = rows.map(function (x) { return '<tr><td>' + x[0] + '</td><td>' + x[1] + '</td></tr>'; }).join('');
+  }
+
+  $('calc').addEventListener('input', calc);
+  $('calc').addEventListener('change', calc);
+  calc();
+})();
+</script>
