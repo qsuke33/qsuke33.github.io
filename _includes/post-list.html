@@ -1,0 +1,19 @@
+{%- comment -%} 記事カードの一覧。include.posts に記事の配列を渡す {%- endcomment -%}
+<ul class="post-list">
+  {%- for post in include.posts -%}
+  <li class="post-card">
+    <a href="{{ post.url | relative_url }}">
+      {%- if post.image -%}
+      <img src="{{ post.image | relative_url }}" alt="{{ post.product | default: post.title }}" loading="lazy" width="160" height="160">
+      {%- else -%}
+      <span class="noimage">No Image</span>
+      {%- endif -%}
+      <div class="card-text">
+        {% unless post.pr == false %}<span class="card-pr">PR</span>{% endunless %}
+        <h2>{{ post.title }}</h2>
+        <p class="post-meta">{{ post.date | date: '%Y年%-m月%-d日' }}{% if post.category %} ・ {{ post.category }}{% endif %}</p>
+      </div>
+    </a>
+  </li>
+  {%- endfor -%}
+</ul>

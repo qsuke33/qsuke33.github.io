@@ -11,7 +11,7 @@ layout: default
   </ul>
 </section>
 
-{%- assign story = site.posts | where: "category", "資産運用の体験記" | first -%}
+{%- assign story = site.posts | where: "section", "money" | last -%}
 {%- if story %}
 <a class="owner" href="{{ story.url | relative_url }}">
   <span class="owner-label">運営者について</span>
@@ -23,24 +23,13 @@ layout: default
 <h2 class="section-title">計算ツール</h2>
 {% include tool-list.html %}
 
-{%- if site.posts.size > 0 %}
-<h2 class="section-title">記事</h2>
-<ul class="post-list">
-  {%- for post in site.posts -%}
-  <li class="post-card">
-    <a href="{{ post.url | relative_url }}">
-      {%- if post.image -%}
-      <img src="{{ post.image | relative_url }}" alt="{{ post.product | default: post.title }}" loading="lazy" width="160" height="160">
-      {%- else -%}
-      <span class="noimage">No Image</span>
-      {%- endif -%}
-      <div class="card-text">
-        {% unless post.pr == false %}<span class="card-pr">PR</span>{% endunless %}
-        <h2>{{ post.title }}</h2>
-        <p class="post-meta">{{ post.date | date: '%Y年%-m月%-d日' }}{% if post.category %} ・ {{ post.category }}{% endif %}</p>
-      </div>
-    </a>
-  </li>
-  {%- endfor -%}
-</ul>
+{%- assign money = site.posts | where: "section", "money" -%}
+{%- assign reviews = site.posts | where_exp: "p", "p.section != 'money'" -%}
+{%- if money.size > 0 %}
+<h2 class="section-title">資産運用・お金の記事</h2>
+{% include post-list.html posts=money %}
+{%- endif -%}
+{%- if reviews.size > 0 %}
+<h2 class="section-title">買ってよかったもの</h2>
+{% include post-list.html posts=reviews %}
 {%- endif -%}
