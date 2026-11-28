@@ -23,7 +23,7 @@
 - url: /tools/fire/
   icon: fire
   name: FIRE 取り崩しシミュレーター
-  summary: 資産は何歳までもつ？2,000回の試算で成功確率、定額と定率を比較
+  summary: 資産は何歳までもつ？年齢ごとに取り崩し額を変えて試算
 - url: /tools/iryohi/
   icon: cross
   name: 医療費控除シミュレーター

@@ -178,3 +178,6 @@ main.wrap { padding-top: 20px; padding-bottom: 40px; }
 .lg-band { background: rgba(47,111,94,.16); }
 .lg-med { height: 2px; background: #2f6f5e; }
 .lg-bad { height: 0; border-top: 2px dashed #b3261e; }
+.tool-form .phase { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.tool-form .phase input[type=number] { width: 4.2em; }
+.tool-form .phase { flex-wrap: nowrap; font-size: .95rem; }
