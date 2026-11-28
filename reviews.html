@@ -1,0 +1,13 @@
+---
+layout: page
+title: 買ってよかったもの
+description: 実際に自分で買って使ったものの中から、買ってよかったものを写真つきで紹介します。
+permalink: /reviews/
+---
+<p>実際に自分で買って使ったものの中から、「買ってよかった」と思えたものを、自分で撮った写真つきで紹介しています。</p>
+{%- assign reviews = site.posts | where_exp: "p", "p.section != 'money'" -%}
+{%- if reviews.size > 0 %}
+{% include post-list.html posts=reviews %}
+{%- else %}
+<p class="empty">まだ記事がありません。</p>
+{%- endif %}
