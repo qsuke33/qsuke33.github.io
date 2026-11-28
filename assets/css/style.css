@@ -159,3 +159,4 @@ main.wrap { padding-top: 20px; padding-bottom: 40px; }
 .rm-banner strong { display: block; color: var(--rakuten); font-size: 1rem; }
 .rm-banner span:last-child { font-size: .85rem; color: var(--muted); }
 .rm-pr { position: absolute; top: 8px; right: 10px; font-size: .65rem; color: var(--muted); border: 1px solid var(--line); padding: 0 5px; border-radius: 3px; }
+.post-body .card-text h2 { font-size: 1rem; line-height: 1.5; margin: 2px 0 4px; padding: 0; border: 0; }

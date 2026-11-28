@@ -32,6 +32,6 @@ layout: default
 {% include post-list.html posts=money %}
 {%- endif -%}
 {%- if reviews.size > 0 %}
-<h2 class="section-title">買ってよかったもの</h2>
+<h2 class="section-title"><a href="{{ '/reviews/' | relative_url }}">買ってよかったもの</a></h2>
 {% include post-list.html posts=reviews %}
 {%- endif -%}
