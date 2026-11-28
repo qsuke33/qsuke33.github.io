@@ -1,7 +1,7 @@
 ---
 layout: default
 title: FIRE 取り崩しシミュレーター【資産は何歳までもつ？年齢ごとに取り崩し額を設定】
-description: FIRE後に資産を取り崩すと何歳までもつかを計算。「50歳から月20万円、年金が出る65歳からは月10万円」のように、年齢ごとに取り崩し額を変えて試算できます。資産の推移グラフつき。
+description: FIRE後に資産を取り崩すと何歳までもつかを計算。「50歳から月20万円、年金が出る65歳からは月10万円」のように、年齢ごとに取り崩し額を変えて試算できます。利回りを2通り入れて、資産の推移をグラフで比べられます。
 permalink: /tools/fire/
 ---
 <article class="page tool">
@@ -13,10 +13,12 @@ permalink: /tools/fire/
     <label>取り崩しを始めるときの資産
       <span class="field"><input id="assets" type="number" inputmode="numeric" min="0" step="100" value="4000"> 万円</span>
     </label>
-    <label>想定利回り（年）
-      <span class="field"><input id="ret" type="number" inputmode="decimal" min="-5" max="15" step="0.1" value="4"> %</span>
-      <small>全世界株・S&amp;P500などの株式中心なら4〜5%、債券を混ぜるなら低めが目安です。</small>
-    </label>
+    <fieldset>
+      <legend>想定利回り（年）を2つ比べる</legend>
+      <label class="ret"><span class="sw sw-a"></span>利回りA <span class="field"><input id="retA" type="number" inputmode="decimal" min="-5" max="15" step="0.1" value="4"> %</span></label>
+      <label class="ret"><span class="sw sw-b"></span>利回りB <span class="field"><input id="retB" type="number" inputmode="decimal" min="-5" max="15" step="0.1" value="2"> %</span></label>
+      <small>株式中心なら4〜5%、控えめに見るなら1〜2%など、楽観と慎重の2つを入れて比べると安心です。</small>
+    </fieldset>
 
     <fieldset>
       <legend>取り崩し額</legend>
@@ -35,18 +37,13 @@ permalink: /tools/fire/
       <small>1行目の年齢が、取り崩しを始める年齢です。2行目・3行目は、使わなければ空欄にしてください。年金をもらい始めたら取り崩しを減らす、などに使えます。</small>
     </fieldset>
 
-    <label>何歳まで計算するか
-      <span class="field"><input id="until" type="number" inputmode="numeric" min="50" max="110" step="1" value="95"> 歳</span>
-    </label>
   </form>
 
   <section class="tool-result" aria-live="polite">
-    <p class="result-label" id="res-label">資産は</p>
-    <p class="result-value"><span id="headline">—</span></p>
-    <p id="result-note" class="result-note"></p>
     <figure class="fire-chart">
-      <figcaption>資産残高の推移（万円）</figcaption>
+      <figcaption>資産残高の推移（万円・100歳まで）。線が0になったところが、資産が尽きる年齢です。</figcaption>
       <div class="chart-wrap" id="chart"></div>
+      <p class="chart-legend"><span class="lg-row"><span class="lg lg-a"></span>利回りA <span id="lgA"></span></span><span class="lg-row"><span class="lg lg-b"></span>利回りB <span id="lgB"></span></span></p>
     </figure>
     <table class="result-table"><tbody id="breakdown"></tbody></table>
   </section>
@@ -77,6 +74,7 @@ permalink: /tools/fire/
   var $ = function (id) { return document.getElementById(id); };
   var val = function (id) { var v = parseFloat($(id).value); return isFinite(v) ? v : null; };
   var man = function (v) { return Math.round(v / 10000).toLocaleString('ja-JP') + '万円'; };
+  var END = 100;
 
   function phases() {
     var list = [];
@@ -84,19 +82,33 @@ permalink: /tools/fire/
       var a = val('a' + i), m = val('m' + i);
       if (a !== null && m !== null) list.push({ age: Math.round(a), monthly: m * 10000 });
     }
-    list.sort(function (x, y) { return x.age - y.age; });
-    return list;
+    return list.sort(function (x, y) { return x.age - y.age; });
   }
 
-  function drawChart(start, path, endAge) {
-    var W = 640, H = 280, L = 56, R = 12, T = 12, B = 30, n = path.length - 1;
-    var max = Math.max.apply(null, path) || 1;
+  function run(assets, ret, ph) {
+    var start = ph[0].age, months = (END - start) * 12, mr = Math.pow(1 + ret, 1 / 12) - 1;
+    var bal = assets, path = [assets], gone = null, total = 0;
+    for (var k = 0; k < months; k++) {
+      var age = start + k / 12, m = 0;
+      ph.forEach(function (p) { if (age >= p.age - 1e-9) m = p.monthly; });
+      var out = Math.min(bal, m); bal -= out; total += out;
+      if (out < m && gone === null) gone = age;
+      bal *= 1 + mr; if (bal < 1) bal = 0;
+      if ((k + 1) % 12 === 0) path.push(bal);
+    }
+    return { path: path, gone: gone, end: bal, total: total };
+  }
+
+  function ageText(a) { var y = Math.floor(a), m = Math.round((a - y) * 12); if (m === 12) { y++; m = 0; } return y + '歳' + (m ? m + 'か月' : ''); }
+
+  function drawChart(start, A, B) {
+    var W = 640, H = 280, L = 56, R = 64, T = 14, B_ = 30, n = A.path.length - 1;
+    var max = Math.max.apply(null, A.path.concat(B.path)) || 1;
     var unit = [100, 200, 500, 1000, 2000, 5000, 10000, 20000].filter(function (s) { return max / 10000 / s <= 5; })[0] || 50000;
     var top = Math.ceil(max / 10000 / unit) * unit * 10000;
     var x = function (i) { return L + (W - L - R) * i / n; };
-    var y = function (v) { return T + (H - T - B) * (1 - Math.max(0, v) / top); };
-    var d = path.map(function (v, i) { return (i ? 'L' : 'M') + x(i).toFixed(1) + ',' + y(v).toFixed(1); }).join('');
-    var area = d + 'L' + x(n) + ',' + y(0) + 'L' + x(0) + ',' + y(0) + 'Z';
+    var y = function (v) { return T + (H - T - B_) * (1 - Math.max(0, v) / top); };
+    var line = function (p) { return p.map(function (v, i) { return (i ? 'L' : 'M') + x(i).toFixed(1) + ',' + y(v).toFixed(1); }).join(''); };
     var g = '';
     for (var v = 0; v <= top + 1; v += unit * 10000) {
       g += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(v) + '" y2="' + y(v) + '" class="g"/>' +
@@ -104,52 +116,37 @@ permalink: /tools/fire/
     }
     var st = n > 40 ? 10 : 5;
     for (var i = 0; i <= n; i++) if ((start + i) % st === 0) g += '<text x="' + x(i) + '" y="' + (H - 8) + '" text-anchor="middle" class="t">' + (start + i) + '歳</text>';
+    var la = y(A.path[n]), lb = y(B.path[n]); if (Math.abs(la - lb) < 14) { if (la <= lb) lb = la + 14; else la = lb + 14; }
     $('chart').innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="資産残高の推移">' + g +
-      '<path d="' + area + '" class="band"/><path d="' + d + '" class="med"/>' +
-      '<line class="cross" x1="0" x2="0" y1="' + T + '" y2="' + (H - B) + '" style="display:none"/>' +
-      '<rect class="hit" x="' + L + '" y="' + T + '" width="' + (W - L - R) + '" height="' + (H - T - B) + '"/></svg><div class="tip" style="display:none"></div>';
+      '<path d="' + line(B.path) + '" class="ln-b"/><path d="' + line(A.path) + '" class="ln-a"/>' +
+      '<text x="' + (x(n) + 6) + '" y="' + (la + 4) + '" class="t lb">A ' + man(A.path[n]) + '</text>' +
+      '<text x="' + (x(n) + 6) + '" y="' + (lb + 4) + '" class="t lb">B ' + man(B.path[n]) + '</text>' +
+      '<line class="cross" x1="0" x2="0" y1="' + T + '" y2="' + (H - B_) + '" style="display:none"/>' +
+      '<rect class="hit" x="' + L + '" y="' + T + '" width="' + (W - L - R) + '" height="' + (H - T - B_) + '"/></svg><div class="tip" style="display:none"></div>';
     var svg = $('chart').querySelector('svg'), cross = svg.querySelector('.cross'), tip = $('chart').querySelector('.tip');
     function show(ev) {
       var r = svg.getBoundingClientRect(), px = (ev.touches ? ev.touches[0].clientX : ev.clientX) - r.left;
       var i = Math.max(0, Math.min(n, Math.round((px / r.width * W - L) / (W - L - R) * n)));
       cross.setAttribute('x1', x(i)); cross.setAttribute('x2', x(i)); cross.style.display = '';
       tip.style.display = ''; tip.style.left = Math.min(r.width - 150, Math.max(0, x(i) / W * r.width - 70)) + 'px';
-      tip.innerHTML = '<strong>' + (start + i) + '歳</strong><br>' + man(path[i]);
+      tip.innerHTML = '<strong>' + (start + i) + '歳</strong><br>A ' + man(A.path[i]) + '<br>B ' + man(B.path[i]);
     }
     svg.addEventListener('mousemove', show); svg.addEventListener('touchstart', show, { passive: true }); svg.addEventListener('touchmove', show, { passive: true });
     svg.addEventListener('mouseleave', function () { cross.style.display = 'none'; tip.style.display = 'none'; });
   }
 
   function calc() {
-    var assets = (val('assets') || 0) * 10000, ret = (val('ret') || 0) / 100, ph = phases();
-    var until = Math.round(val('until') || 95);
-    if (!assets || !ph.length || until <= ph[0].age) { $('headline').textContent = '—'; $('breakdown').innerHTML = ''; $('chart').innerHTML = ''; return; }
-    var start = ph[0].age, months = (until - start) * 12, mr = Math.pow(1 + ret, 1 / 12) - 1;
-    var bal = assets, path = [assets], gone = null, totalOut = 0;
-    for (var k = 0; k < months; k++) {
-      var age = start + k / 12, m = 0;
-      ph.forEach(function (p) { if (age >= p.age - 1e-9) m = p.monthly; });
-      var out = Math.min(bal, m); bal -= out; totalOut += out;
-      if (bal <= 0 && m > 0 && gone === null && out < m) gone = age;
-      bal *= 1 + mr;
-      if (bal < 1) { bal = 0; if (gone === null && k < months - 1) gone = start + (k + 1) / 12; }
-      if ((k + 1) % 12 === 0) path.push(bal);
-    }
-    if (gone !== null) {
-      var gy = Math.floor(gone), gm = Math.round((gone - gy) * 12);
-      $('res-label').textContent = '資産が尽きるのは';
-      $('headline').textContent = gy + '歳' + (gm ? gm + 'か月' : '') + 'ごろ';
-      $('result-note').textContent = until + '歳までもたせるには、取り崩し額を減らすか、資産を増やす必要があります。';
-    } else {
-      $('res-label').textContent = until + '歳の時点で残る資産';
-      $('headline').textContent = man(bal);
-      $('result-note').textContent = until + '歳まで資産は尽きません。';
-    }
-    drawChart(start, path, until);
+    var assets = (val('assets') || 0) * 10000, ph = phases();
+    if (!assets || !ph.length || ph[0].age >= END) { $('chart').innerHTML = ''; $('breakdown').innerHTML = ''; return; }
+    var rA = (val('retA') || 0) / 100, rB = (val('retB') || 0) / 100;
+    var A = run(assets, rA, ph), B = run(assets, rB, ph);
+    var res = function (r) { return r.gone !== null ? ageText(r.gone) + 'で尽きる' : END + '歳で' + man(r.end) + '残る'; };
+    $('lgA').textContent = '（' + (rA * 100).toFixed(1) + '%：' + res(A) + '）';
+    $('lgB').textContent = '（' + (rB * 100).toFixed(1) + '%：' + res(B) + '）';
+    drawChart(ph[0].age, A, B);
     var first = ph[0].monthly * 12;
-    var rows = [['取り崩しを始める年齢', start + '歳'], ['1年目の取り崩し率', (first / assets * 100).toFixed(1) + '%（4%以下が目安）']];
+    var rows = [['1年目の取り崩し率', (first / assets * 100).toFixed(1) + '%（4%以下が目安）']];
     ph.forEach(function (p) { rows.push([p.age + '歳からの取り崩し', '月' + man(p.monthly) + '（年' + man(p.monthly * 12) + '）']); });
-    rows.push(['取り崩した合計', man(totalOut)]);
     rows.push(['4%ルールで必要な資産（1年目の額）', man(first * 25)]);
     $('breakdown').innerHTML = rows.map(function (x) { return '<tr><td>' + x[0] + '</td><td>' + x[1] + '</td></tr>'; }).join('');
   }
