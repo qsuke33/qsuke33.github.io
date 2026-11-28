@@ -9,7 +9,7 @@ permalink: /tools/fire/
   <h1 class="post-title">FIRE 取り崩しシミュレーター</h1>
   <p class="tool-lead">FIRE（早期リタイア）後に、貯めた資産を取り崩して暮らすと<strong>何歳までもつか</strong>を計算します。「50歳から月20万円、年金が出る65歳からは月10万円」のように、<strong>年齢ごとに取り崩し額を変えられます</strong>。入力内容はこの端末の中だけで計算し、どこにも送信しません。</p>
 
-  <form id="calc" class="tool-form" onsubmit="return false">
+  <form id="calc" class="tool-form">
     <label>取り崩しを始めるときの資産
       <span class="field"><input id="assets" type="number" inputmode="numeric" min="0" step="100" value="4000"> 万円</span>
     </label>
@@ -37,9 +37,10 @@ permalink: /tools/fire/
       <small>1行目の年齢が、取り崩しを始める年齢です。2行目・3行目は、使わなければ空欄にしてください。年金をもらい始めたら取り崩しを減らす、などに使えます。</small>
     </fieldset>
 
+    <button type="submit" class="btn btn-run">シミュレーションする</button>
   </form>
 
-  <section class="tool-result" aria-live="polite">
+  <section class="tool-result" id="result" aria-live="polite">
     <figure class="fire-chart">
       <figcaption>資産残高の推移（万円・100歳まで）。線が0になったところが、資産が尽きる年齢です。</figcaption>
       <div class="chart-wrap" id="chart"></div>
@@ -155,10 +156,13 @@ permalink: /tools/fire/
     $('breakdown').innerHTML = rows.map(function (x) { return '<tr><td>' + x[0] + '</td><td>' + x[1] + '</td></tr>'; }).join('');
   }
 
-  var timer;
-  var schedule = function () { clearTimeout(timer); timer = setTimeout(calc, 150); };
-  $('calc').addEventListener('input', schedule);
-  $('calc').addEventListener('change', schedule);
+  $('calc').addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (document.activeElement) document.activeElement.blur();
+    calc();
+    var r = $('result').getBoundingClientRect();
+    if (r.top < 0 || r.top > window.innerHeight * 0.6) window.scrollBy({ top: r.top - 12, behavior: 'smooth' });
+  });
   calc();
 })();
 </script>
