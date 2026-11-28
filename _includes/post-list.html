@@ -1,6 +1,6 @@
 {%- comment -%} 記事カードの一覧。include.posts に記事の配列を渡す {%- endcomment -%}
 <ul class="post-list">
-  {%- for post in include.posts -%}
+  {%- for post in include.posts limit: include.limit -%}
   <li class="post-card">
     <a href="{{ post.url | relative_url }}">
       {%- if post.image -%}
