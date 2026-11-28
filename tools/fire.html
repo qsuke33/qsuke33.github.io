@@ -104,13 +104,16 @@ permalink: /tools/fire/
   function drawChart(start, A, B) {
     var W = 640, H = 280, L = 56, R = 64, T = 14, B_ = 30, n = A.path.length - 1;
     var max = Math.max.apply(null, A.path.concat(B.path)) || 1;
-    var unit = [100, 200, 500, 1000, 2000, 5000, 10000, 20000].filter(function (s) { return max / 10000 / s <= 5; })[0] || 50000;
+    // 目盛りは最大でも6本程度（どんな金額でも描画が重くならないように）
+    var raw = max / 10000 / 5, mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    var unit = [1, 2, 2.5, 5, 10].map(function (k) { return k * mag; }).filter(function (u) { return u >= raw; })[0];
+    if (!(unit > 0)) unit = 1;
     var top = Math.ceil(max / 10000 / unit) * unit * 10000;
     var x = function (i) { return L + (W - L - R) * i / n; };
     var y = function (v) { return T + (H - T - B_) * (1 - Math.max(0, v) / top); };
     var line = function (p) { return p.map(function (v, i) { return (i ? 'L' : 'M') + x(i).toFixed(1) + ',' + y(v).toFixed(1); }).join(''); };
     var g = '';
-    for (var v = 0; v <= top + 1; v += unit * 10000) {
+    for (var v = 0, c = 0; v <= top + 1 && c < 12; v += unit * 10000, c++) {
       g += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(v) + '" y2="' + y(v) + '" class="g"/>' +
         '<text x="' + (L - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end" class="t">' + Math.round(v / 10000).toLocaleString('ja-JP') + '</text>';
     }
@@ -138,7 +141,8 @@ permalink: /tools/fire/
   function calc() {
     var assets = (val('assets') || 0) * 10000, ph = phases();
     if (!assets || !ph.length || ph[0].age >= END) { $('chart').innerHTML = ''; $('breakdown').innerHTML = ''; return; }
-    var rA = (val('retA') || 0) / 100, rB = (val('retB') || 0) / 100;
+    var clamp = function (v) { return Math.max(-20, Math.min(30, v || 0)) / 100; };
+    var rA = clamp(val('retA')), rB = clamp(val('retB'));
     var A = run(assets, rA, ph), B = run(assets, rB, ph);
     var res = function (r) { return r.gone !== null ? ageText(r.gone) + 'で尽きる' : END + '歳で' + man(r.end) + '残る'; };
     $('lgA').textContent = '（' + (rA * 100).toFixed(1) + '%：' + res(A) + '）';
@@ -151,8 +155,10 @@ permalink: /tools/fire/
     $('breakdown').innerHTML = rows.map(function (x) { return '<tr><td>' + x[0] + '</td><td>' + x[1] + '</td></tr>'; }).join('');
   }
 
-  $('calc').addEventListener('input', calc);
-  $('calc').addEventListener('change', calc);
+  var timer;
+  var schedule = function () { clearTimeout(timer); timer = setTimeout(calc, 150); };
+  $('calc').addEventListener('input', schedule);
+  $('calc').addEventListener('change', schedule);
   calc();
 })();
 </script>
