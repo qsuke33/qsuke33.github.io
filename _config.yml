@@ -23,7 +23,7 @@ webmaster_verifications:
   google: "bAJYdXUFVpJAni5vPUiA54s0o5_2j1aMw9nI9ruLHZc"
 
 # 楽天モバイルの紹介URL（my 楽天モバイル／Rakuten Link の「紹介する」で取得）。空なら公式キャンペーンページに飛ぶ
-rakuten_mobile_referral_url: ""
+rakuten_mobile_referral_url: "https://r10.to/h55HcN"
 
 # お問い合わせフォーム（Googleフォーム等）のURL。空欄なら「準備中」と表示。
 contact_form_url: ""
