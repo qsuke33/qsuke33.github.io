@@ -46,7 +46,7 @@ permalink: /tools/nenshu-kabe/
         <tr><td>169万円</td><td>配偶者特別控除が満額（38万円）でなくなり、段階的に減る</td><td>家族</td></tr>
         <tr><td><strong>178万円</strong></td><td>働く本人に<strong>所得税</strong>がかかり始める。2025年は160万円</td><td>本人</td></tr>
         <tr><td>197万円</td><td>特定親族特別控除がなくなる</td><td>家族</td></tr>
-        <tr><td>約207万円</td><td>配偶者特別控除がなくなる</td><td>家族</td></tr>
+        <tr><td>207万円超</td><td>配偶者特別控除がなくなる</td><td>家族</td></tr>
       </tbody>
     </table>
     </div>
@@ -89,7 +89,7 @@ permalink: /tools/nenshu-kabe/
     if (who === 'spouse') {
       if (v <= 136) out.push(item('ok', '家族は配偶者控除（38万円）を受けられます。'));
       else if (v <= 169) out.push(item('ok', '配偶者控除の136万円は超えますが、家族は配偶者特別控除（満額38万円）を受けられるので、税金の影響はほぼありません。'));
-      else if (v < 207) out.push(item('warn', '家族の配偶者特別控除が減り始めています（169万円超で段階的に減少）。'));
+      else if (v <= 207) out.push(item('warn', '家族の配偶者特別控除が減り始めています（169万円超で段階的に減少）。'));
       else out.push(item('over', '家族の配偶者特別控除はなくなります。'));
     } else if (who === 'student') {
       if (v <= 136) out.push(item('ok', '家族は特定扶養控除（63万円）を受けられます。'));

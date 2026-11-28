@@ -75,13 +75,14 @@ permalink: /tools/fire/
   var $ = function (id) { return document.getElementById(id); };
   var val = function (id) { var v = parseFloat($(id).value); return isFinite(v) ? v : null; };
   var man = function (v) { return Math.round(v / 10000).toLocaleString('ja-JP') + '万円'; };
+  var short = function (v) { return v >= 1e8 ? (v / 1e8).toFixed(1) + '億円' : man(v); };
   var END = 100;
 
   function phases() {
     var list = [];
     for (var i = 0; i < 3; i++) {
       var a = val('a' + i), m = val('m' + i);
-      if (a !== null && m !== null) list.push({ age: Math.round(a), monthly: m * 10000 });
+      if (a !== null && m !== null && a >= 0 && a < 100) list.push({ age: Math.round(a), monthly: Math.max(0, m) * 10000 });
     }
     return list.sort(function (x, y) { return x.age - y.age; });
   }
@@ -103,7 +104,7 @@ permalink: /tools/fire/
   function ageText(a) { var y = Math.floor(a), m = Math.round((a - y) * 12); if (m === 12) { y++; m = 0; } return y + '歳' + (m ? m + 'か月' : ''); }
 
   function drawChart(start, A, B) {
-    var W = 640, H = 280, L = 56, R = 64, T = 14, B_ = 30, n = A.path.length - 1;
+    var W = 640, H = 280, L = 56, R = 84, T = 14, B_ = 30, n = A.path.length - 1;
     var max = Math.max.apply(null, A.path.concat(B.path)) || 1;
     // 目盛りは最大でも6本程度（どんな金額でも描画が重くならないように）
     var raw = max / 10000 / 5, mag = Math.pow(10, Math.floor(Math.log10(raw)));
@@ -115,18 +116,18 @@ permalink: /tools/fire/
     var line = function (p) { return p.map(function (v, i) { return (i ? 'L' : 'M') + x(i).toFixed(1) + ',' + y(v).toFixed(1); }).join(''); };
     var g = '';
     for (var v = 0, c = 0; v <= top + 1 && c < 12; v += unit * 10000, c++) {
-      g += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(v) + '" y2="' + y(v) + '" class="g"/>' +
+      g += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(v) + '" y2="' + y(v) + '" class="g" stroke="#e4e2dc"/>' +
         '<text x="' + (L - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end" class="t">' + Math.round(v / 10000).toLocaleString('ja-JP') + '</text>';
     }
     var st = n > 40 ? 10 : 5;
     for (var i = 0; i <= n; i++) if ((start + i) % st === 0) g += '<text x="' + x(i) + '" y="' + (H - 8) + '" text-anchor="middle" class="t">' + (start + i) + '歳</text>';
     var la = y(A.path[n]), lb = y(B.path[n]); if (Math.abs(la - lb) < 14) { if (la <= lb) lb = la + 14; else la = lb + 14; }
     $('chart').innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="資産残高の推移">' + g +
-      '<path d="' + line(B.path) + '" class="ln-b"/><path d="' + line(A.path) + '" class="ln-a"/>' +
-      '<text x="' + (x(n) + 6) + '" y="' + (la + 4) + '" class="t lb">A ' + man(A.path[n]) + '</text>' +
-      '<text x="' + (x(n) + 6) + '" y="' + (lb + 4) + '" class="t lb">B ' + man(B.path[n]) + '</text>' +
-      '<line class="cross" x1="0" x2="0" y1="' + T + '" y2="' + (H - B_) + '" style="display:none"/>' +
-      '<rect class="hit" x="' + L + '" y="' + T + '" width="' + (W - L - R) + '" height="' + (H - T - B_) + '"/></svg><div class="tip" style="display:none"></div>';
+      '<path d="' + line(B.path) + '" class="ln-b" fill="none" stroke="#c2611b" stroke-width="2.5" stroke-dasharray="7 4"/><path d="' + line(A.path) + '" class="ln-a" fill="none" stroke="#1f8a6d" stroke-width="2.5"/>' +
+      '<text x="' + (x(n) + 6) + '" y="' + (la + 4) + '" class="t lb">A ' + short(A.path[n]) + '</text>' +
+      '<text x="' + (x(n) + 6) + '" y="' + (lb + 4) + '" class="t lb">B ' + short(B.path[n]) + '</text>' +
+      '<line class="cross" stroke="#6b6b6b" x1="0" x2="0" y1="' + T + '" y2="' + (H - B_) + '" style="display:none"/>' +
+      '<rect class="hit" fill="transparent" x="' + L + '" y="' + T + '" width="' + (W - L - R) + '" height="' + (H - T - B_) + '"/></svg><div class="tip" style="display:none"></div>';
     var svg = $('chart').querySelector('svg'), cross = svg.querySelector('.cross'), tip = $('chart').querySelector('.tip');
     function show(ev) {
       var r = svg.getBoundingClientRect(), px = (ev.touches ? ev.touches[0].clientX : ev.clientX) - r.left;

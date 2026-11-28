@@ -77,7 +77,7 @@ permalink: /tools/loan/
   }
 
   function calc() {
-    var P = num('amount') * 10000, r = num('rate') / 100, n = Math.round(num('years')) * 12;
+    var P = num('amount') * 10000, r = Math.min(num('rate'), 30) / 100, n = Math.min(50, Math.round(num('years'))) * 12;
     var method = $('method').value;
     if (!P || !n) { $('monthly').textContent = '—'; $('breakdown').innerHTML = ''; $('ratetable').innerHTML = ''; $('result-note').textContent = ''; return; }
     var res = method === 'annuity' ? annuity(P, r, n) : principal(P, r, n);
