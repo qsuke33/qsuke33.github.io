@@ -1,0 +1,141 @@
+---
+layout: default
+title: 楽天モバイルに乗り換えるといくら得？料金シミュレーター＋紹介で13,000ポイント【2026年】
+description: 今のスマホ代を入れるだけで、楽天モバイルに乗り換えた場合に年間いくら安くなるかを計算。紹介リンクからの乗り換えで13,000ポイント。資産4,000万円の会社員が家族で使っている実体験つき。
+permalink: /rakuten-mobile/
+image: /assets/images/ogp.png
+---
+{%- assign referral = site.rakuten_mobile_referral_url | default: "https://network.mobile.rakuten.co.jp/campaign/referral/" -%}
+{%- capture cta -%}
+<a class="btn btn-rakuten btn-cta" href="{{ referral }}" target="_blank" rel="sponsored noopener">紹介リンクから楽天モバイルを見る</a>
+<p class="cta-note">紹介リンク経由の初めての申し込みで、乗り換え（MNP）なら<strong>13,000ポイント</strong>、新しい番号なら12,000ポイント（期間限定ポイント・分割で進呈）</p>
+{%- endcapture -%}
+<article class="page tool lp">
+  <p class="pr-label"><span>広告・PR</span>このページには、運営者の楽天モバイル紹介リンクが含まれます。紹介リンクから申し込まれると、運営者にも楽天ポイントが進呈されます。</p>
+
+  <section class="lp-hero">
+    <p class="lp-kicker">年収400万円台・資産4,000万円の会社員が家族で使っています</p>
+    <h1>楽天モバイルに乗り換えると<br>スマホ代はいくら下がる？</h1>
+    <div class="lp-points">
+      <span class="lp-points-label">紹介リンクから乗り換えで</span>
+      <span class="lp-points-num">13,000<small>ポイント</small></span>
+    </div>
+    <ul class="lp-merits">
+      <li><strong>データ無制限でも月3,278円</strong>（税込・使った分だけの段階制）</li>
+      <li><strong>楽天市場のポイントが+4倍</strong>（SPU）</li>
+      <li><strong>楽天ひかりとセットで毎月1,000ポイント</strong></li>
+    </ul>
+    {{ cta }}
+  </section>
+
+  <h2 class="section-title">今のスマホ代と比べてみる</h2>
+  <form id="calc" class="tool-form" onsubmit="return false">
+    <label>今の毎月のスマホ代（1人分・税込）
+      <span class="field"><input id="now" type="number" inputmode="numeric" min="0" step="100" value="7000"> 円</span>
+      <small>端末代の分割払いは除いた、通信料だけの金額です。</small>
+    </label>
+    <label>毎月使うデータ量
+      <select id="gb">
+        <option value="3">3GBまで（ほぼWi-Fi）</option>
+        <option value="20" selected>3〜20GB</option>
+        <option value="99">20GB超（無制限）</option>
+      </select>
+    </label>
+    <label>乗り換える人数
+      <span class="field"><input id="people" type="number" inputmode="numeric" min="1" max="10" step="1" value="1"> 人</span>
+      <small>2人以上は家族割（1人あたり月110円引き）で計算します。</small>
+    </label>
+    <label class="check"><input id="mnp" type="checkbox" checked> 今の電話番号のまま乗り換える（MNP）</label>
+  </form>
+
+  <section class="tool-result" aria-live="polite">
+    <p class="result-label">1年で安くなる金額（目安）</p>
+    <p class="result-value"><span id="save">—</span><span class="unit">円</span></p>
+    <p id="result-note" class="result-note"></p>
+    <table class="result-table"><tbody id="breakdown"></tbody></table>
+    {{ cta }}
+  </section>
+
+  <h2 class="section-title">私が楽天モバイルを使っている理由</h2>
+  <div class="post-body">
+    <p>地方の零細企業に勤める会社員です。年収はずっと400万円台ですが、<a href="{{ '/posts/2026/11/27/shisan-4000man/' | relative_url }}">インデックス投資で資産は約4,000万円</a>になりました。資産を増やせた一番の理由は、<strong>毎月の固定費を下げて、浮いたお金を投資に回し続けた</strong>ことです。</p>
+    <p>スマホは、毎月必ず払う固定費の代表です。楽天モバイルにしてからは、料金が下がっただけでなく、<strong>楽天市場の買い物のポイントが+4倍</strong>になりました。2026年には妻にも紹介し、2人分の紹介ポイントをもらっています。光回線も楽天ひかりにして、<strong>毎月1,000ポイント</strong>がもらえています。</p>
+    <p>おかげで、2026年の楽天ポイントは<strong>10万ポイントを超えました</strong>（<a href="{{ '/posts/2026/11/28/rakuten-keizaiken/' | relative_url }}">楽天経済圏の使い方</a>）。</p>
+  </div>
+
+  <h2 class="section-title">楽天モバイルの料金（Rakuten最強プラン）</h2>
+  <div class="table-scroll">
+  <table class="kabe-table">
+    <thead><tr><th>データ量</th><th>月額（税込）</th><th>家族割（税込）</th></tr></thead>
+    <tbody>
+      <tr><td>3GBまで</td><td>1,078円</td><td>968円</td></tr>
+      <tr><td>3〜20GB</td><td>2,178円</td><td>2,068円</td></tr>
+      <tr><td>20GB超（無制限）</td><td>3,278円</td><td>3,168円</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="cta-note">使ったデータ量で料金が自動で決まるので、プランを選ぶ必要がありません。通話は「Rakuten Link」アプリを使えば国内通話が無料です（一部対象外の番号あり）。</p>
+
+  <h2 class="section-title">紹介キャンペーンでもらえるポイント</h2>
+  <div class="table-scroll">
+  <table class="kabe-table">
+    <thead><tr><th>申し込み方</th><th>もらえるポイント</th></tr></thead>
+    <tbody>
+      <tr><td>他社から電話番号そのまま乗り換え（MNP）</td><td><strong>13,000ポイント</strong></td></tr>
+      <tr><td>新しい電話番号で申し込み</td><td>12,000ポイント</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <ul class="post-body">
+    <li>楽天モバイルを<strong>初めて申し込む人</strong>が対象です。データタイプは対象外です。</li>
+    <li>紹介リンクから楽天IDでログインし、その翌々月末までに申し込み、Rakuten Linkで10秒以上通話するなどの条件があります。</li>
+    <li>ポイントは期間限定ポイントで、数か月に分けて進呈されます。</li>
+    <li>条件の詳細は<a href="https://network.mobile.rakuten.co.jp/campaign/referral/" target="_blank" rel="noopener">楽天モバイル公式の紹介キャンペーンページ</a>で確認してください（2026年11月時点の内容です）。</li>
+  </ul>
+
+  {{ cta }}
+
+  <h2 class="section-title">よくある不安</h2>
+  <div class="faq">
+    <details><summary>電波がつながりにくいって本当？</summary><p>場所によります。都市部では問題を感じない人が多い一方、建物の奥や地方の一部ではつながりにくいことがあります。申し込む前に、<a href="https://network.mobile.rakuten.co.jp/area/" target="_blank" rel="noopener">公式の通信エリアマップ</a>で自宅と職場を確認してください。不安なら、今の回線を残したまま、楽天モバイルを2台目（eSIM）として試す方法もあります。</p></details>
+    <details><summary>解約するときにお金はかかる？</summary><p>楽天モバイル（Rakuten最強プラン）は、契約期間の縛りや解約手数料がありません。合わなければ、ほかの会社に乗り換えられます。</p></details>
+    <details><summary>今のスマホはそのまま使える？</summary><p>多くの機種でそのまま使えますが、古い機種や一部の機種は非対応です。公式サイトの「ご利用製品の対応状況確認」で調べられます。</p></details>
+    <details><summary>家族で乗り換えるときのコツは？</summary><p>まず1人が契約し、その人の紹介リンクから残りの家族が申し込むと、家族全員が紹介ポイントをもらえ、紹介した人にも1人ごとに7,000ポイントが入ります。家族割（1人あたり月110円引き）も忘れずに。</p></details>
+    <details><summary>株主優待で無料になるって聞いたけど？</summary><p>楽天グループの株を100株以上持っていると、楽天モバイルの回線（30GB／月）が最大1年無料になる株主優待があります。ただし優待回線はSPU（+4倍）の対象外で、株価の値下がりのリスクもあります。詳しくは<a href="{{ '/posts/2026/11/28/rakuten-tsushinhi/' | relative_url }}">こちらの記事</a>で。</p></details>
+  </div>
+
+  <section class="lp-final">
+    <p><strong>スマホ代は、一度下げれば毎月ずっと効きます。</strong><br>浮いた分を積み立てに回すのが、私が資産を増やせたやり方です。</p>
+    {{ cta }}
+  </section>
+  <p class="updated">最終更新：2026年11月28日</p>
+  {% include related-tools.html %}
+</article>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var num = function (id) { var v = parseFloat($(id).value); return isFinite(v) && v > 0 ? v : 0; };
+  var yen = function (v) { return Math.round(v).toLocaleString('ja-JP') + '円'; };
+  var PRICE = { 3: 1078, 20: 2178, 99: 3278 };
+  function calc() {
+    var now = num('now'), people = Math.max(1, Math.floor(num('people')) || 1);
+    var price = PRICE[$('gb').value] - (people >= 2 ? 110 : 0);
+    var saveYear = (now - price) * 12 * people;
+    var pts = ($('mnp').checked ? 13000 : 12000) * people;
+    $('save').textContent = now > 0 ? Math.round(saveYear).toLocaleString('ja-JP') : '—';
+    $('result-note').textContent = saveYear > 0
+      ? '紹介ポイントも合わせると、1年目は約' + yen(saveYear + pts) + '分おトクになる計算です。'
+      : '今の料金のほうが安いようです。無理に乗り換える必要はありません。';
+    $('breakdown').innerHTML = [
+      ['今の料金（' + people + '人・月）', yen(now * people)],
+      ['楽天モバイル（' + people + '人・月）', yen(price * people)],
+      ['紹介ポイント（初回のみ）', pts.toLocaleString('ja-JP') + 'ポイント'],
+      ['1年目の合計メリット', yen(saveYear + pts)]
+    ].map(function (r) { return '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td></tr>'; }).join('');
+  }
+  $('calc').addEventListener('input', calc);
+  $('calc').addEventListener('change', calc);
+  calc();
+})();
+</script>
