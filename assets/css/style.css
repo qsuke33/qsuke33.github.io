@@ -30,13 +30,14 @@ main.wrap { padding-top: 20px; padding-bottom: 40px; }
 .post-card .noimage { display: flex; align-items: center; justify-content: center; font-size: .7rem; color: var(--muted); }
 .card-text { min-width: 0; }
 .card-text h2 { font-size: 1rem; line-height: 1.5; margin: 2px 0 4px; }
-.card-pr { font-size: .7rem; color: var(--pr-fg); background: var(--pr-bg); padding: 0 6px; border-radius: 3px; }
+.card-pr { font-size: .65rem; color: var(--muted); border: 1px solid var(--line); padding: 0 5px; border-radius: 3px; }
 .post-meta { margin: 0; font-size: .8rem; color: var(--muted); }
 .tag { margin-left: 8px; padding: 0 8px; border: 1px solid var(--line); border-radius: 999px; }
 .empty { color: var(--muted); }
 
-.pr-label { margin: 0 0 16px; padding: 8px 12px; background: var(--pr-bg); color: var(--pr-fg); border-radius: 6px; font-size: .85rem; line-height: 1.6; }
-.pr-label span { font-weight: 700; margin-right: 8px; }
+/* 広告表示：ステマ規制で「明瞭に」が必要なので、小さくしすぎず・背景と同化させず、色だけ控えめに */
+.pr-label { margin: 0 0 10px; color: var(--muted); font-size: .8rem; line-height: 1.6; }
+.pr-label span { display: inline-block; margin-right: 6px; padding: 0 6px; border: 1px solid var(--muted); border-radius: 3px; font-size: .7rem; font-weight: 700; line-height: 1.5; }
 .post-title { font-size: 1.4rem; line-height: 1.5; margin: 0 0 6px; }
 .product-name { font-size: .95rem; }
 .post-body h2 { font-size: 1.15rem; margin-top: 2em; padding-bottom: 4px; border-bottom: 2px solid var(--line); }
@@ -157,4 +158,4 @@ main.wrap { padding-top: 20px; padding-bottom: 40px; }
 .rm-banner { display: block; margin: 12px 0 0; padding: 14px 16px; border-radius: 14px; background: #fff5f5; border: 1px solid #f1d4d4; color: var(--fg); text-decoration: none; position: relative; }
 .rm-banner strong { display: block; color: var(--rakuten); font-size: 1rem; }
 .rm-banner span:last-child { font-size: .85rem; color: var(--muted); }
-.rm-pr { position: absolute; top: 8px; right: 10px; font-size: .65rem; color: var(--pr-fg); background: var(--pr-bg); padding: 0 6px; border-radius: 3px; }
+.rm-pr { position: absolute; top: 8px; right: 10px; font-size: .65rem; color: var(--muted); border: 1px solid var(--line); padding: 0 5px; border-radius: 3px; }
