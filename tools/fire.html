@@ -1,0 +1,241 @@
+---
+layout: default
+title: FIRE 取り崩しシミュレーター【資産は何歳までもつ？成功確率・定額と定率を比較】
+description: FIRE後に資産を取り崩すと何歳までもつかを計算。運用利回りの上下を2,000回試算した成功確率、定額と定率の比較、インフレ・年金・NISAと課税口座の税金も考慮できます。4%ルールの必要資産もわかります。
+permalink: /tools/fire/
+---
+<article class="page tool">
+  <nav class="crumbs"><a href="{{ '/' | relative_url }}">ホーム</a> › <a href="{{ '/tools/' | relative_url }}">計算ツール</a></nav>
+  <h1 class="post-title">FIRE 取り崩しシミュレーター</h1>
+  <p class="tool-lead">FIRE（早期リタイア）後に、貯めた資産を取り崩して暮らすと<strong>何歳までもつか</strong>を計算します。運用の良い年・悪い年をランダムに<strong>2,000回試算</strong>して、資産が最後まで残る<strong>成功確率</strong>も出します。入力内容はこの端末の中だけで計算し、どこにも送信しません。</p>
+
+  <form id="calc" class="tool-form" onsubmit="return false">
+    <label>今の年齢（取り崩しを始める年齢）
+      <span class="field"><input id="age" type="number" inputmode="numeric" min="20" max="90" step="1" value="50"> 歳</span>
+    </label>
+    <label>取り崩しを始めるときの資産
+      <span class="field"><input id="assets" type="number" inputmode="numeric" min="0" step="100" value="4000"> 万円</span>
+    </label>
+    <label>取り崩し方
+      <select id="method">
+        <option value="fixed">定額（毎月同じ額を取り崩す）</option>
+        <option value="rate">定率（毎年、資産の一定割合を取り崩す）</option>
+      </select>
+    </label>
+    <label id="wrap-fixed">毎月の取り崩し額（今のお金の価値で）
+      <span class="field"><input id="monthly" type="number" inputmode="decimal" min="0" step="0.5" value="15"> 万円</span>
+      <small>インフレ率に合わせて毎年増やして計算します。</small>
+    </label>
+    <label id="wrap-rate" style="display:none">毎年の取り崩し率
+      <span class="field"><input id="rate" type="number" inputmode="decimal" min="0" max="20" step="0.1" value="4"> %</span>
+      <small>毎年はじめの資産にこの率をかけた額を、その年に取り崩します。</small>
+    </label>
+    <label>想定利回り（年・平均）
+      <span class="field"><input id="ret" type="number" inputmode="decimal" min="-5" max="15" step="0.1" value="5"> %</span>
+      <small>長い目で見た年率（複利）の目安です。全世界株・S&amp;P500などの株式中心なら4〜6%、債券を混ぜるなら低めに。</small>
+    </label>
+    <label>リスク（値動きの大きさ・年）
+      <span class="field"><input id="risk" type="number" inputmode="decimal" min="0" max="40" step="1" value="15"> %</span>
+      <small>株式中心なら15〜20%、バランス型なら8〜10%が目安です。0にすると毎年ちょうど想定利回りで計算します。</small>
+    </label>
+    <label>インフレ率（年）
+      <span class="field"><input id="infl" type="number" inputmode="decimal" min="0" max="10" step="0.1" value="2"> %</span>
+    </label>
+    <fieldset>
+      <legend>年金</legend>
+      <label>受け取り開始 <span class="field"><input id="penAge" type="number" min="60" max="75" step="1" value="65"> 歳</span></label>
+      <label>毎月の受取額（手取り） <span class="field"><input id="pen" type="number" inputmode="decimal" min="0" step="0.5" value="10"> 万円</span></label>
+      <small>受け取り開始後は、取り崩し額から年金の分を差し引きます（定額のとき）。ねんきん定期便の見込額が目安です。</small>
+    </fieldset>
+    <fieldset>
+      <legend>税金</legend>
+      <label>資産のうちNISA口座の割合 <span class="field"><input id="nisa" type="number" min="0" max="100" step="5" value="50"> %</span></label>
+      <label>課税口座の含み益の割合 <span class="field"><input id="gain" type="number" min="0" max="100" step="5" value="40"> %</span></label>
+      <small>課税口座から取り崩すときは、利益の部分に20.315%の税金がかかります。NISA口座から先に使う前提で計算します。</small>
+    </fieldset>
+    <label>何歳まで資産がもてばよいか
+      <span class="field"><input id="until" type="number" min="60" max="110" step="1" value="95"> 歳</span>
+    </label>
+  </form>
+
+  <section class="tool-result" aria-live="polite">
+    <p class="result-label" id="res-label">資産が最後まで残る確率</p>
+    <p class="result-value"><span id="prob">—</span><span class="unit">%</span></p>
+    <p id="result-note" class="result-note"></p>
+    <figure class="fire-chart">
+      <figcaption id="chart-title">資産残高の推移（万円・今のお金の価値ではなく将来の金額）</figcaption>
+      <div class="chart-wrap" id="chart"></div>
+      <p class="chart-legend"><span class="lg lg-band"></span>試算の半分が入る範囲（上位25%〜下位25%） <span class="lg lg-med"></span>真ん中のケース <span class="lg lg-bad"></span>悪いほう（下位10%）</p>
+    </figure>
+    <table class="result-table"><tbody id="breakdown"></tbody></table>
+  </section>
+
+  <div class="post-body">
+    <h2>見方のポイント</h2>
+    <ul>
+      <li><strong>成功確率</strong>は、2,000通りの将来のうち、目標の年齢まで資産が残ったものの割合です。一般に80〜90%以上なら余裕がある、50%台は心もとない計画といえます。</li>
+      <li><strong>悪いほう（下位10%）</strong>の線が途中で0になるなら、運が悪い10年に当たると資産が尽きる計画です。取り崩し額を少し減らすか、働く期間を延ばすと改善します。</li>
+      <li>リタイア直後に暴落が来ると、資産の減りが大きくなります（シーケンス・リスク）。同じ平均利回りでも結果がばらつくのはこのためです。</li>
+    </ul>
+
+    <h2>定額と定率、どちらがいい？</h2>
+    <ul>
+      <li><strong>定額</strong>：毎月の生活費が安定して、家計の計画が立てやすい。ただ、相場が悪い時期にも同じ額を売るので、資産の減りが速くなりがちです。</li>
+      <li><strong>定率</strong>：資産が減ると取り崩し額も減るので、資産が0になりにくい。そのかわり、毎年もらえる額が相場しだいで上下します。</li>
+      <li>はじめは定額、生活費の目途がついたら定率に切り替える、という組み合わせ方もあります。</li>
+    </ul>
+
+    <h2>4%ルールとは</h2>
+    <p>「年間の支出の<strong>25倍</strong>の資産があれば、毎年<strong>4%</strong>ずつ取り崩しても資産はほぼ尽きない」という、アメリカの研究をもとにした目安です。ただし、もとになったのは米国の過去データと30年間の取り崩しです。日本でインフレや円高の影響を受ける場合や、30年より長く取り崩す早期リタイアでは、3〜3.5%と控えめに考える人も多いです。</p>
+
+    <h2>計算の前提</h2>
+    <ul>
+      <li>毎年の利回りは、想定利回り（年率・複利）とリスクから、対数正規分布でランダムに決めています（真ん中のケースがおおむね想定利回りどおりに増える設定です）。実際の相場は、大きな暴落がこれより起きやすいこともあります。</li>
+      <li>取り崩しは毎年はじめに1年分をまとめて行う形で計算しています。</li>
+      <li>年金は物価に合わせて増える前提です（実際は、マクロ経済スライドで物価ほどは増えないことがあります）。</li>
+      <li>税金は、NISA口座から先に取り崩し、課税口座は売った額のうち含み益の割合に20.315%がかかる前提の概算です。</li>
+    </ul>
+    <p class="updated">最終更新：2026年11月28日</p>
+  </div>
+  {% include related-tools.html %}
+</article>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var num = function (id) { var v = parseFloat($(id).value); return isFinite(v) ? v : 0; };
+  var man = function (v) { return Math.round(v / 10000).toLocaleString('ja-JP') + '万円'; };
+  var RUNS = 2000, TAX = 0.20315;
+
+  // 再現できる乱数（入力が同じなら同じ結果）
+  function rng(seed) { return function () { seed |= 0; seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function gauss(r) { var u = 1 - r(), v = r(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+
+  function simulate(p, returns) {
+    // returns: 年ごとの利回りの配列。戻り値: 年ごとの資産（年はじめ）
+    var nisa = p.assets * p.nisa, tax = p.assets - nisa;
+    var basis = tax * (1 - p.gain);
+    var path = [p.assets], depleted = null, firstNet = null;
+    for (var y = 0; y < p.years; y++) {
+      var total = nisa + tax;
+      var infl = Math.pow(1 + p.infl, y);
+      var need;
+      if (p.method === 'fixed') {
+        need = p.monthly * 12 * infl;
+        if (p.age + y >= p.penAge) need = Math.max(0, need - p.pen * 12 * infl);
+      } else {
+        need = total * p.rate;
+      }
+      if (y === 0) firstNet = need;
+      // NISA から先に使う
+      var fromN = Math.min(nisa, need); nisa -= fromN; var rest = need - fromN;
+      if (rest > 0 && tax > 0) {
+        var gainShare = tax > 0 ? Math.max(0, (tax - basis) / tax) : 0;
+        var gross = rest / (1 - gainShare * TAX);
+        if (gross > tax) gross = tax;
+        basis -= basis * (gross / tax);
+        tax -= gross; rest -= gross * (1 - gainShare * TAX);
+      }
+      if (rest > 1 && depleted === null) depleted = y;
+      var g = 1 + returns[y];
+      nisa = Math.max(0, nisa * g); tax = Math.max(0, tax * g);
+      path.push(nisa + tax);
+      if (nisa + tax <= 0 && depleted === null) depleted = y + 1;
+    }
+    return { path: path, depleted: depleted, firstNeed: firstNet };
+  }
+
+  function pct(arr, q) { var a = arr.slice().sort(function (x, y) { return x - y; }); var i = (a.length - 1) * q, lo = Math.floor(i), hi = Math.ceil(i); return a[lo] + (a[hi] - a[lo]) * (i - lo); }
+
+  function drawChart(p, med, lo, hi, q1) {
+    var W = 640, H = 300, L = 56, R = 12, T = 12, B = 30;
+    var max = Math.max.apply(null, hi.concat(med)) || 1;
+    var step = Math.pow(10, Math.floor(Math.log10(max / 10000)));
+    var nice = [1, 2, 2.5, 5, 10].map(function (m) { return m * step; }).filter(function (s) { return max / 10000 / s <= 5; })[0] || step * 10;
+    var top = Math.ceil(max / 10000 / nice) * nice * 10000;
+    var x = function (i) { return L + (W - L - R) * i / p.years; };
+    var y = function (v) { return T + (H - T - B) * (1 - Math.max(0, v) / top); };
+    var line = function (a) { return a.map(function (v, i) { return (i ? 'L' : 'M') + x(i).toFixed(1) + ',' + y(v).toFixed(1); }).join(''); };
+    var band = line(hi) + hi.map(function (_, i) { var j = hi.length - 1 - i; return 'L' + x(j).toFixed(1) + ',' + y(q1[j]).toFixed(1); }).join('') + 'Z';
+    var grid = '', ticks = '';
+    for (var v = 0; v <= top + 1; v += nice * 10000) {
+      grid += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(v) + '" y2="' + y(v) + '" class="g"/>';
+      ticks += '<text x="' + (L - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end" class="t">' + Math.round(v / 10000).toLocaleString('ja-JP') + '</text>';
+    }
+    var stepYears = p.years > 40 ? 10 : 5;
+    for (var i = 0; i <= p.years; i++) {
+      if ((p.age + i) % stepYears === 0) ticks += '<text x="' + x(i) + '" y="' + (H - 8) + '" text-anchor="middle" class="t">' + (p.age + i) + '歳</text>';
+    }
+    $('chart').innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="資産残高の推移">' + grid +
+      '<path d="' + band + '" class="band"/>' +
+      '<path d="' + line(lo) + '" class="bad"/>' +
+      '<path d="' + line(med) + '" class="med"/>' + ticks +
+      '<line class="cross" x1="0" x2="0" y1="' + T + '" y2="' + (H - B) + '" style="display:none"/>' +
+      '<rect class="hit" x="' + L + '" y="' + T + '" width="' + (W - L - R) + '" height="' + (H - T - B) + '"/></svg>' +
+      '<div class="tip" style="display:none"></div>';
+    var svg = $('chart').querySelector('svg'), cross = svg.querySelector('.cross'), tip = $('chart').querySelector('.tip');
+    function show(ev) {
+      var r = svg.getBoundingClientRect(), px = (ev.touches ? ev.touches[0].clientX : ev.clientX) - r.left;
+      var i = Math.round((px / r.width * W - L) / (W - L - R) * p.years); i = Math.max(0, Math.min(p.years, i));
+      cross.setAttribute('x1', x(i)); cross.setAttribute('x2', x(i)); cross.style.display = '';
+      tip.style.display = ''; tip.style.left = Math.min(r.width - 150, Math.max(0, x(i) / W * r.width - 70)) + 'px';
+      tip.innerHTML = '<strong>' + (p.age + i) + '歳</strong><br>真ん中 ' + man(med[i]) + '<br>悪いほう ' + man(lo[i]) + '<br>上位25% ' + man(hi[i]);
+    }
+    svg.addEventListener('mousemove', show); svg.addEventListener('touchstart', show, { passive: true }); svg.addEventListener('touchmove', show, { passive: true });
+    svg.addEventListener('mouseleave', function () { cross.style.display = 'none'; tip.style.display = 'none'; });
+  }
+
+  function calc() {
+    var method = $('method').value;
+    $('wrap-fixed').style.display = method === 'fixed' ? '' : 'none';
+    $('wrap-rate').style.display = method === 'rate' ? '' : 'none';
+    var p = {
+      age: Math.round(num('age')), assets: num('assets') * 10000, method: method,
+      monthly: num('monthly') * 10000, rate: num('rate') / 100, ret: num('ret') / 100, risk: num('risk') / 100,
+      infl: num('infl') / 100, penAge: Math.round(num('penAge')), pen: num('pen') * 10000,
+      nisa: Math.min(1, Math.max(0, num('nisa') / 100)), gain: Math.min(1, Math.max(0, num('gain') / 100))
+    };
+    p.years = Math.max(1, Math.round(num('until')) - p.age);
+    if (!p.assets || p.years > 90) { $('prob').textContent = '—'; return; }
+
+    var r = rng(12345), finals = [], depl = [], paths = [];
+    for (var k = 0; k < RUNS; k++) {
+      var rs = []; for (var y = 0; y < p.years; y++) rs.push(Math.exp(Math.log(1 + p.ret) + p.risk * gauss(r)) - 1);
+      var s = simulate(p, rs); paths.push(s.path); depl.push(s.depleted);
+    }
+    var flat = simulate(p, Array(p.years).fill(p.ret));
+    var success = depl.filter(function (d) { return d === null; }).length / RUNS;
+    var med = [], lo = [], hi = [], q1 = [];
+    for (var i = 0; i <= p.years; i++) {
+      var col = paths.map(function (a) { return a[i]; });
+      med.push(pct(col, 0.5)); lo.push(pct(col, 0.1)); hi.push(pct(col, 0.75)); q1.push(pct(col, 0.25));
+    }
+    var deplAges = depl.filter(function (d) { return d !== null; }).map(function (d) { return p.age + d; });
+
+    $('prob').textContent = p.risk > 0 ? Math.round(success * 100) : (flat.depleted === null ? 100 : 0);
+    var note;
+    if (flat.depleted === null) note = '毎年ちょうど想定利回りどおりなら、' + (p.age + p.years) + '歳の時点で約' + man(flat.path[p.years]) + '残ります。';
+    else note = '毎年ちょうど想定利回りどおりでも、' + (p.age + flat.depleted) + '歳ごろに資産が尽きます。';
+    if (p.risk > 0 && deplAges.length) note += ' 尽きるケースでは、早いと' + Math.round(pct(deplAges, 0.1)) + '歳ごろ（尽きたケースの早いほう10%）です。';
+    $('result-note').textContent = note;
+
+    drawChart(p, med, lo, hi, q1);
+
+    var yearly = method === 'fixed' ? p.monthly * 12 : p.assets * p.rate;
+    var rows = [
+      ['1年目の取り崩し額', man(flat.firstNeed) + '（月' + man(flat.firstNeed / 12) + '）'],
+      ['取り崩し率（1年目）', (flat.firstNeed / p.assets * 100).toFixed(1) + '%'],
+      ['4%ルールで必要な資産', man(yearly * 25)],
+      [(p.age + p.years) + '歳時点の資産（真ん中）', man(med[p.years])],
+      [(p.age + p.years) + '歳時点の資産（悪いほう）', man(lo[p.years])]
+    ];
+    $('breakdown').innerHTML = rows.map(function (x) { return '<tr><td>' + x[0] + '</td><td>' + x[1] + '</td></tr>'; }).join('');
+  }
+
+  var timer;
+  function schedule() { clearTimeout(timer); timer = setTimeout(calc, 120); }
+  $('calc').addEventListener('input', schedule);
+  $('calc').addEventListener('change', schedule);
+  calc();
+})();
+</script>

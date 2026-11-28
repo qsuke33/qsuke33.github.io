@@ -20,6 +20,10 @@
   icon: piggy
   name: iDeCo 節税シミュレーター
   summary: 掛金でいくら税金が安くなるか計算（2026年12月の上限引き上げ対応）
+- url: /tools/fire/
+  icon: fire
+  name: FIRE 取り崩しシミュレーター
+  summary: 資産は何歳までもつ？2,000回の試算で成功確率、定額と定率を比較
 - url: /tools/iryohi/
   icon: cross
   name: 医療費控除シミュレーター

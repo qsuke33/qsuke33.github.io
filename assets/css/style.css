@@ -160,3 +160,21 @@ main.wrap { padding-top: 20px; padding-bottom: 40px; }
 .rm-banner span:last-child { font-size: .85rem; color: var(--muted); }
 .rm-pr { position: absolute; top: 8px; right: 10px; font-size: .65rem; color: var(--muted); border: 1px solid var(--line); padding: 0 5px; border-radius: 3px; }
 .post-body .card-text h2 { font-size: 1rem; line-height: 1.5; margin: 2px 0 4px; padding: 0; border: 0; }
+/* FIRE チャート */
+.fire-chart { margin: 16px 0 8px; text-align: left; }
+.fire-chart figcaption { font-size: .8rem; color: var(--muted); margin-bottom: 4px; }
+.chart-wrap { position: relative; }
+.chart-wrap svg { width: 100%; height: auto; display: block; }
+.chart-wrap .g { stroke: var(--line); stroke-width: 1; }
+.chart-wrap .t { font-size: 11px; fill: var(--muted); }
+.chart-wrap .band { fill: #2f6f5e; fill-opacity: .16; stroke: none; }
+.chart-wrap .med { fill: none; stroke: #2f6f5e; stroke-width: 2; }
+.chart-wrap .bad { fill: none; stroke: #b3261e; stroke-width: 2; stroke-dasharray: 5 4; }
+.chart-wrap .cross { stroke: var(--muted); stroke-width: 1; }
+.chart-wrap .hit { fill: transparent; cursor: crosshair; }
+.chart-wrap .tip { position: absolute; top: 8px; width: 140px; padding: 6px 8px; background: #fff; border: 1px solid var(--line); border-radius: 8px; font-size: .75rem; line-height: 1.5; box-shadow: 0 2px 8px rgba(0,0,0,.08); pointer-events: none; }
+.chart-legend { font-size: .75rem; color: var(--muted); margin: 6px 0 0; line-height: 1.8; }
+.lg { display: inline-block; width: 18px; height: 10px; vertical-align: middle; margin: 0 4px 0 8px; border-radius: 2px; }
+.lg-band { background: rgba(47,111,94,.16); }
+.lg-med { height: 2px; background: #2f6f5e; }
+.lg-bad { height: 0; border-top: 2px dashed #b3261e; }
