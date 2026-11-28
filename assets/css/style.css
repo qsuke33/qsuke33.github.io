@@ -106,8 +106,8 @@ main.wrap { padding-top: 20px; padding-bottom: 40px; }
 .kabe-table td:last-child { white-space: nowrap; color: var(--muted); }
 .crumbs { font-size: .8rem; color: var(--muted); margin-bottom: 8px; }
 .crumbs a { color: var(--muted); }
-.related-tools { margin-top: 32px; }
-.related-tools h2 { font-size: 1.1rem; }
+.related-tools, .related-posts { margin-top: 32px; }
+.related-tools h2, .related-posts h2 { font-size: 1.1rem; }
 .offers { margin: 20px 0; }
 .offers h2 { font-size: 1.05rem; margin: 0 0 8px; }
 .offer { margin-bottom: 12px; text-align: center; }

@@ -1,0 +1,19 @@
+{%- comment -%}
+  記事の最後の「あわせて読みたい」。同じ分野（お金 / 買ってよかったもの）の記事を優先し、
+  足りなければ他の分野の記事で3件まで埋める。今の記事は除く。
+{%- endcomment -%}
+{%- if page.section == "money" -%}
+  {%- assign same = site.posts | where: "section", "money" -%}
+  {%- assign other = site.posts | where_exp: "p", "p.section != 'money'" -%}
+{%- else -%}
+  {%- assign same = site.posts | where_exp: "p", "p.section != 'money'" -%}
+  {%- assign other = site.posts | where: "section", "money" -%}
+{%- endif -%}
+{%- assign same = same | where_exp: "p", "p.url != page.url" -%}
+{%- assign related = same | concat: other | where_exp: "p", "p.url != page.url" -%}
+{%- if related.size > 0 %}
+<section class="related-posts">
+  <h2>あわせて読みたい</h2>
+  {% include post-list.html posts=related limit=3 %}
+</section>
+{%- endif -%}

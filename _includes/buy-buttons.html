@@ -11,7 +11,7 @@
     {%- assign amz = page.amazon_url -%}
   {%- endif -%}
   {%- if amz -%}
-  <a class="btn btn-amazon" href="{{ amz }}" target="_blank" rel="sponsored noopener">Amazonで見る</a>
+  <a class="btn btn-amazon" href="{{ amz }}" target="_blank" rel="sponsored noopener">Amazonで価格を見る</a>
   {%- endif -%}
   {%- if page.rakuten_url -%}
     {%- if aff.rakuten_id != "" -%}
@@ -19,7 +19,7 @@
     {%- else -%}
       {%- assign rkt = page.rakuten_url -%}
     {%- endif -%}
-  <a class="btn btn-rakuten" href="{{ rkt }}" target="_blank" rel="sponsored noopener">楽天市場で見る</a>
+  <a class="btn btn-rakuten" href="{{ rkt }}" target="_blank" rel="sponsored noopener">楽天市場で価格を見る</a>
   {%- endif -%}
 </div>
 {%- endif -%}
