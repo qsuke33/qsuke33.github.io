@@ -1,10 +1,10 @@
 ---
 layout: page
 title: 買ってよかったもの
-description: 実際に買って使い、良かったと思えたものだけを、自分で撮った写真で紹介します。
+description: 自分で実際に買って、良かったと思えたものだけを紹介します。
 permalink: /reviews/
 ---
-<p>実際に買って使い、良かったと思えたものだけを、自分で撮った写真で紹介しています。</p>
+<p>自分で実際に買って、良かったと思えたものだけを紹介しています。</p>
 {%- assign reviews = site.posts | where_exp: "p", "p.section != 'money'" -%}
 {%- if reviews.size > 0 %}
 {% include post-list.html posts=reviews %}
